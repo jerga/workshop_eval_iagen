@@ -16,7 +16,9 @@
         "mechatroner.rainbow-csv"
       ],
       "settings": {
-        "python.defaultInterpreterPath": ".venv/bin/python"
+        "python.defaultInterpreterPath": ".venv/bin/python",
+        "python.terminal.useEnvFile": true,
+        "python.envFile": "${workspaceFolder}/.env"
       }
     }
   }
