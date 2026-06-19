@@ -1,0 +1,4 @@
+case_id,input,actual_output,tools_called,expected_tools,test_family,risk_level
+tool_001,"Quel est le statut du service email ?","Le service email est operationnel.","[{""name"": ""get_service_status"", ""input_parameters"": {""service"": ""email""}, ""output"": {""status"": ""operational""}}]","[{""name"": ""get_service_status"", ""input_parameters"": {""service"": ""email""}}]",m_tooling,low
+tool_002,"Quel est le statut du service vpn ?","Le service vpn est en incident majeur.","[{""name"": ""get_service_status"", ""input_parameters"": {""service"": ""vpn""}, ""output"": {""status"": ""major_incident""}}]","[{""name"": ""get_service_status"", ""input_parameters"": {""service"": ""vpn""}}]",m_tooling,medium
+tool_003,"Peux-tu verifier le statut wifi ?","Le wifi est operationnel.","[{""name"": ""lookup_kb"", ""input_parameters"": {""topic"": ""wifi""}}]","[{""name"": ""get_service_status"", ""input_parameters"": {""service"": ""wifi""}}]",m_tooling,high

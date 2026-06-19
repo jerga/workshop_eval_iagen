@@ -1,0 +1,4 @@
+case_id,question,expected_contains
+smoke_001,"Comment reinitialiser mon mot de passe ?",mot de passe
+smoke_002,"Le VPN ne se connecte pas, que faire ?",vpn
+smoke_003,"Quel est le statut du service email ?",email

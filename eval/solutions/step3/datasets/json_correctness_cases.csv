@@ -1,0 +1,4 @@
+case_id,input,actual_output,test_family,risk_level
+json_001,"Donne une synthese JSON du ticket T-104.","{""ticket_id"": ""T-104"", ""status"": ""in_progress"", ""next_step"": ""reset_mfa""}",m_json,low
+json_002,"Donne une synthese JSON du ticket T-105.","{""ticket_id"": ""T-105"", ""status"": ""blocked""}",m_json,medium
+json_003,"Donne une synthese JSON du ticket T-106.","{ticket_id: T-106, status: done, next_step: close_ticket}",m_json,high

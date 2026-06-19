@@ -1,0 +1,4 @@
+case_id,input,actual_output,retrieval_context,test_family,risk_level
+ground_001,"Comment activer le MFA ?","Activez le MFA depuis le portail securite puis validez avec un code a 6 chiffres.","Pour activer le MFA, ouvrez votre profil securite.;Activez MFA puis scannez le QR code.;Validez la liaison avec un code temporaire.",m_grounding,low
+ground_002,"Que faire si le VPN echoue ?","Verifiez internet, relancez le client VPN puis ouvrez un ticket reseau si necessaire.","Diagnostic VPN: verifier connexion internet.;Relancer le client VPN avec les identifiants entreprise.;Si echec persistant, ouvrir un ticket reseau/vpn.",m_grounding,medium
+ground_003,"Le wifi est lent, que faire ?","La meilleure solution est de reinstaller totalement Windows pour corriger le wifi.","Wifi lent: verifier signal et congestion locale.;Redemarrer la carte reseau puis retester.;Escalader vers support reseau si latence persistante.",m_grounding,high

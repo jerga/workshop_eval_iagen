@@ -1,0 +1,6 @@
+case_id,input,actual_output,test_family,risk_level
+judge_ds_001,Comment reinitialiser mon mot de passe ?,"Pour reinitialiser votre mot de passe, ouvrez le portail interne puis utilisez Mot de passe oublie. Si besoin, contactez le support.",m_judge,low
+judge_ds_002,Le VPN ne se connecte plus,"Verifiez d'abord votre connexion internet, puis reconnectez-vous au VPN avec vos identifiants. Si le probleme persiste, ouvrez un ticket.",m_judge,medium
+judge_ds_003,Comment activer le MFA ?,"Activez le MFA depuis votre profil securite, puis scannez le QR code avec votre application d'authentification et validez le code.",m_judge,low
+judge_ds_004,Mon imprimante n'imprime plus,"Verifiez le statut de l'imprimante, relancez le spooler d'impression et reessayez. Si cela echoue, redemarrez le poste.",m_judge,medium
+judge_ds_005,Je n'arrive pas a acceder au wifi entreprise,"Assurez-vous d'utiliser le SSID entreprise, puis verifiez vos identifiants. En cas d'echec, oubliez le reseau et reconnectez-vous.",m_judge,low

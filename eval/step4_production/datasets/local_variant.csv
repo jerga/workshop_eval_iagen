@@ -1,0 +1,4 @@
+case_id,input,expected_output,expected_contains,category
+prod_var_001,"Comment configurer le MFA ?","Activez MFA via le portail securite et confirmez avec un code a 6 chiffres.",mfa,mfa
+prod_var_002,"Je n'arrive pas a imprimer en reseau interne.","Verifiez etat en ligne, relancez le service d'impression puis ouvrez un ticket workplace/printing.",impression,printing
+prod_var_003,"Le wifi est-il operationnel ?","Le statut wifi peut etre confirme et des actions de depannage peuvent etre proposees.",wifi,status

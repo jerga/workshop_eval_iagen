@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual envs
+.venv/
+venv/
+
+# Environment
+.env
+
+# Build / cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Workshop outputs
+results/
+.deepeval/
+
+# Copilot
+.github/copilot-instructions.md
+
+# OS
+.DS_Store
+Thumbs.db
