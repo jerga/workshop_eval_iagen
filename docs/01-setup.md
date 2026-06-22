@@ -53,12 +53,13 @@ LLM_API_KEY=...             # Clé API (fournie pour le workshop)
 LLM_MODEL=...               # Nom du modèle à utiliser
 
 EMBEDDING_API_BASE=https://...
-EMBEDDING_API_KEY=...
+EMBEDDING_API_KEY=... 
 EMBEDDING_MODEL=...
 ```
 
 > [!TIP]
-> Les clés LLM sont fournies pour le workshop — utilise-les telles quelles. Si tu préfères utiliser tes propres clés, tu peux remplacer ces valeurs.
+> Les clés LLM sont fournies pour le workshop — utilise-les telles quelles. Par défaut réutilise les mêmes valeurs pour `API_BASE` et `API_KEY` pour le LLM et l'EMBEDDING.
+> Si tu préfères utiliser tes propres clés, tu peux remplacer ces valeurs.
 
 > [!IMPORTANT]
 > À cette étape, tu n'as besoin que des variables LLM et Embedding dans ton `.env`. Le reste de la configuration sera ajoutée plus tard.

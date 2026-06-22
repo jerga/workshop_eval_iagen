@@ -107,9 +107,8 @@ sequenceDiagram
 
 👨‍💻 Des TODOs ont été ajoutés, **complète le code** :
 
-1. `TODO-01` : réécris le critère du juge "**ton professionnel**".
-	- Analyse le style attendu du prompt de l'agent (sous `app/prompts.py`) et demande au juge de bien vérifier les critères « professionnel + vouvoiement + actionnable ».
-2. `TODO-02` : réécris le critère **présence intro/conclusion** avec des consignes complètes et non ambiguës.
+1. `TODO-01` : réécris le critère du juge "**ton professionnel**" (propriété `criteria`), et demande au juge de bien vérifier les critères « professionnel + vouvoiement »
+2. `TODO-02` : réécris le critère **présence intro/conclusion** avec des consignes complètes et non ambiguës pour contrôler la présence de ces 2 éléments.
 
 > [!NOTE]
 > Pour exécuter cette section du script, lance :  
@@ -118,11 +117,13 @@ sequenceDiagram
 > ```
 > Observe l'output du test, les résultats sont structurés et détaillés. Ca facilite l'interprétation (géré par le framework DeepEval).
 
-> [!Warning]
-> Le test **présence intro/conclusion** devrait normalement échouer... Il manque une instruction dans le prompt de l'agent, complète le sous `app/prompts.py`.
+> [!WARNING]
+> Le test **présence intro/conclusion** devrait normalement échouer... Il manque une instruction dans le prompt de l'agent.
+> 
+> `TODO-02-BIS` : Complète le `SYSTEM_PROMPT` de l'agent dans `app/prompts.py` pour ajouter l'instruction de démarrer par une introduction (avec le mot "Bonjour" par exemple).
 
 
-👨‍💻 **Teste des variantes** :
+👨‍💻 **BONUS : Teste des variantes** :
 
 Pour bien comprendre l'effet d'un critère, provoque volontairement des PASS et des FAIL :
 
@@ -132,10 +133,12 @@ Pour bien comprendre l'effet d'un critère, provoque volontairement des PASS et 
 
 ⚠️ Modifie un paramètre à la fois !
 
-> [!TIP]
-> Un bon prompt juge ressemble à une **grille de correction**, pas à une dissertation. Tu peux tester 2 formulations (courte vs détaillée) et compare la stabilité du score.
+> [!NOTE]
+> Dans le cadre de ce TP, l'agent (le system prompt) est très simple, et le modèle utilisé pour le juge dans ce TP est volontairement "modeste".
+>
+> Ce n'est donc pas étonnant de voir peu de changement lors des différents tests.
 
-> [!WARNING]
+> [!TIP]
 > Si le critère du juge est flou, le score devient **bruité** (instable d'un run à l'autre). Sois explicite sur ce qui doit passer ou échouer.
 
 
@@ -212,25 +215,19 @@ On a modélisé cela dans `get_agent_answer_and_context(question)`, qui appelle 
 
 1. `TODO-03` : calibre le seuil de faithfulness en définissant un niveau de risque acceptable. Consulte la doc de la métrique si besoin.
 
-> [!TIP]
-> Commence avec un seuil intermédiaire, puis ajuste après quelques runs et une lecture manuelle des cas limites.
-
 > [!NOTE]
 > Pour exécuter cette section du script, lance :  
 > ```bash
 > uv run python eval/step2_foundations/basic_eval_examples.py --section grounding
 > ```
 
+Avec la question posée dans le test ("Comment diagnostiquer un incident VPN ?"), le résultat devrait être très bon, car les infos sur la gestion des VPN est dans la base de connaissance (voir les fiches sous `app/data/knowledge_base`), et les infos sont donc chargées dans le `retrieval_context`.
+
+N'hésite pas à tester d'autres questions en prenant un thème qui n'existe dans les fiches (ex: `AWS`, `Claude Code`, ...).
+
+
 > [!WARNING]
 > Un seuil **trop bas** laisse passer des approximations (hallucinations tolérées). Un seuil **trop haut** peut bloquer des réponses pourtant utiles.
-
-
-
-👨‍💻 **Teste des variantes**
-
-- **Faire passer** : garde une réponse strictement contenue dans le `retrieval_context` renvoyé par l'agent (exemple VPN, ...). Voir les sujets traités par la base de connaissance dans `app/data/knowledge_base`.
-- **Faire échouer** : Modifie le thème (ex: VPN), par un thème qui n'est pas dans la base de connaissance (ex: Azure).
-- **Jouer sur le seuil** : avec la même réponse, monte le `threshold` pour la faire basculer en FAIL, ou baisse-le pour la faire passer.
 
 
 ## Solution

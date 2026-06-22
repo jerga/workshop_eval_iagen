@@ -39,7 +39,7 @@ def llm_judge_section() -> list[bool]:
 
     answer, _ = get_agent_answer_and_context(question)
 
-    # TODO-01: rendre le prompt du juge plus precis pour qu'il évalue bien que les instructions importantes du prompt système de l'agent sont bien respectées.
+    # TODO-01: rendre le prompt du juge plus précis pour qu'il évalue les instructions importantes du prompt système de l'agent
     tone_metric = GEval(
         name="ProfessionalTone",
         model=model,
@@ -48,12 +48,12 @@ def llm_judge_section() -> list[bool]:
         threshold=0.5,
     )
 
-    # TODO-02: ajuster la consigne pour verifier explicitement formule d'intro et formule de conclusion.
+    # TODO-02: ajuster la consigne pour vérifier explicitement formule d'intro et formule de conclusion.
     formula_metric = GEval(
         name="AnswerStructure",
         model=model,
         criteria=(
-            "La réponse doit contenir une formule de conclusion (ex: Cordialement)...."
+            "La réponse doit contenir ..."
         ),
         evaluation_params=[SingleTurnParams.ACTUAL_OUTPUT],
         threshold=0.5,
