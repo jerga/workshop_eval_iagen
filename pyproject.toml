@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "deepeval>=2.0.0",
-  "langfuse>=2.41.0",
+  "langfuse>=3.0.0",
   "openai>=1.40.0",
   "pydantic>=2.8.2",
   "python-dotenv>=1.0.1",

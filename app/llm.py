@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from openai import OpenAI
+from langfuse.openai import OpenAI
 
 from app.config import AppConfig
 

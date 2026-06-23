@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 
+from langfuse import get_client, observe
+
 from app.config import load_config
 from app.embeddings import OpenAICompatibleEmbeddings
 from app.llm import OpenAICompatibleLLM
@@ -38,6 +40,7 @@ class SupportRAGAgent:
 
         return None
 
+    @observe(name="support-rag-agent")
     def answer(self, question: str) -> AgentResult:
         retrieved = self.retriever.search(question, top_k=3)
 
@@ -67,6 +70,11 @@ class SupportRAGAgent:
             "tool_call_count": len(tool_calls),
             "model": self.config.llm_model,
         }
+
+        # On expose une entree/sortie de trace lisible (question -> reponse)
+        client = get_client()
+        client.set_current_trace_io(input=question, output=final_answer)
+        client.update_current_span(metadata=metadata)
 
         return AgentResult(
             answer=final_answer,

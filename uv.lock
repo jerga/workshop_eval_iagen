@@ -487,7 +487,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "deepeval", specifier = ">=2.0.0" },
-    { name = "langfuse", specifier = ">=2.41.0" },
+    { name = "langfuse", specifier = ">=3.0.0" },
     { name = "openai", specifier = ">=1.40.0" },
     { name = "pydantic", specifier = ">=2.8.2" },
     { name = "python-dotenv", specifier = ">=1.0.1" },

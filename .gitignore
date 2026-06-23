@@ -22,8 +22,11 @@ results/
 .deepeval/
 
 # Copilot
-.github/copilot-instructions.md
+.github/
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Data
+eval/step4_production/datasets/online_traces.json

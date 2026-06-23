@@ -61,7 +61,7 @@ def load_config() -> AppConfig:
         llm_api_key=_required_env("LLM_API_KEY"),
         llm_model=_required_env("LLM_MODEL"),
         llm_provider=llm_provider,
-        llm_temperature=float(os.getenv("LLM_TEMPERATURE", "0")),
+        llm_temperature=float(os.getenv("LLM_TEMPERATURE", "1")),
         llm_max_tokens=int(os.getenv("LLM_MAX_TOKENS", "1024")),
         embedding_api_base=_required_env("EMBEDDING_API_BASE"),
         embedding_api_key=_required_env("EMBEDDING_API_KEY"),

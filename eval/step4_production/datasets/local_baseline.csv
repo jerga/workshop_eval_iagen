@@ -1,4 +1,0 @@
-case_id,input,expected_output,expected_contains,category
-prod_base_001,"Comment reinitialiser mon mot de passe ?","Utilisez le portail password-reset puis validez via MFA.",mot de passe,password
-prod_base_002,"Le VPN ne fonctionne pas, que dois-je faire ?","Verifiez internet, relancez le client VPN et ouvrez un ticket network/vpn si necessaire.",vpn,vpn
-prod_base_003,"Quel est le statut du service email ?","Le statut du service email peut etre confirme via l'outil de statut.",email,status
