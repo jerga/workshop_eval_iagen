@@ -84,9 +84,10 @@ Récupère directement les valeurs des variables sur l'écran qui suit le premie
 	- `Public Key` → `LANGFUSE_PUBLIC_KEY`
 	- `Host` → `LANGFUSE_BASE_URL` (ici `https://cloud.langfuse.com`)
 
-4. Copie ces 3 variables dans ton fichier `.env` :
+4. Copie ces 3 variables dans ton fichier `.env`, ET passe à `true` la variable `LANGFUSE_TRACING_ENABLED`:
 
 ```bash
+LANGFUSE_TRACING_ENABLED=true
 LANGFUSE_PUBLIC_KEY=pk-lf-...
 LANGFUSE_SECRET_KEY=sk-lf-...
 LANGFUSE_BASE_URL=https://cloud.langfuse.com
@@ -117,7 +118,7 @@ Prends 2 minutes pour explorer la barre latérale de Langfuse. Les sections clé
 
 Du **tracing** a déjà été ajouté à l'application pour que chaque exécution remonte dans Langfuse.
 
-Le tracing était inactif tant que les variables d'env n'étaient pas définies.
+Le tracing était inactif tant que les variables d'env n'étaient pas définies (et que `LANGFUSE_TRACING_ENABLED` était à `false`).
 
 ### 🔎 Comment instrumenter une application
 
@@ -194,15 +195,21 @@ uv run python -m app.cli "Comment activer le MFA sur mon compte ?"
 
 ### ✅ Analyser les traces dans l'UI
 
-Ouvre **Tracing** dans Langfuse et clique sur une trace (icone "span" avec une double flèche bleue ↔️). Observe en particulier :
+Ouvre **Tracing** dans Langfuse et clique sur une trace (icone "span" avec une double flèche bleue ↔️, il doit y en avoir 3 de ce type). Observe en particulier :
 
-- l'**entrée** (la question) et la **sortie** (la réponse) au niveau de la trace ;
-- la **génération** imbriquée (l'appel LLM) avec son **modèle**, ses **tokens** ;
-- la **latence** de chaque étape ;
-- le `trace_id` (en haut) — on en aura besoin juste après.
+- l'**input** (la question, dans le 1er bloc) et l'**output** (la réponse, dans le bloc qui suit) ;
+- la **génération** imbriquée, dans l'arbre de gauche (l'appel LLM, nommé `OpenAI-generation` avec l'icone rose) avec les infos techniques (latence, modèle, tokens, ...) ;
+- le `trace_id` (tout en haut, après  `support-rag-agent:`) — on en aura besoin juste après.
 
 > [!TIP]
 > Garde en tête la notion de **trace** = une exécution complète, et d'**observation** (span / génération) = une étape à l'intérieur. C'est sur la **trace** qu'on va rattacher notre score d'évaluation.
+
+> [!NOTE]
+> Tu as forcément repéré les 7 spans imbriqués `OpenAI-embedding` (icone orange).
+> 
+> Rappel : notre agent est "bricolé" et les actions d'embedding sont réalisées en live à chaque appel. Ce n'est évidemment pas optimisé, mais au moins ça illustre le concept de spans imbriqués dans une trace.
+>
+> N'hésite pas à y jeter un oeil aussi, tu verras pour chaque le contenu du document à vectoriser.
 
 ---
 
@@ -222,7 +229,7 @@ En évaluation en ligne, on ne part pas d'un dataset préparé à la main : on p
 
 ### ✅ Exporter les traces via le SDK
 
-Le script [`export_traces.py`](../eval/step4_production/export_traces.py) liste les 3 dernières traces de l'agent `support-rag-agent` et les enregistre en local (JSON) :
+Le script [`export_traces.py`](../eval/step4_production/export_traces.py) liste les **3** dernières traces de l'agent `support-rag-agent` et les enregistre en local (JSON) :
 
 ```bash
 uv run python eval/step4_production/export_traces.py
@@ -264,6 +271,13 @@ Colonnes produites dans `datasets/judge_online_cases.csv` :
 - `actual_output` : la réponse de l'agent (depuis la trace)
 - `trace_id` : pour relier le score à la trace d'origine
 
+> [!NOTE]
+> Cette étape n'est pas obligatoire. On peut directement utiliser l'export JSON.
+>
+> Ici on fait cette transformation pour simplifier la réutilisation des pipelines initiés au TPs précédents.
+>
+> Dans une démarche industrielle, il peut être bénéfique en terme de maintenance de réutiliser le même "moteur" d'évaluation pour le hors ligne ou le "en-ligne".
+
 ### ✅ Lancer l'éval Judge sur ce dataset
 
 On ne rejoue **que** l'éval Judge du TP 03, avec ses **2 métriques** :
@@ -276,7 +290,9 @@ uv run python eval/step4_production/judge_pipeline.py
 ```
 
 > [!NOTE]
-> Contrairement au TP 03 (qui utilisait `pytest` + `assert_test` pour un gate pass/fail), on a besoin ici de la **valeur numérique** du score (0 → 1) pour la remonter dans Langfuse. Le pipeline appelle donc directement `metric.measure()` et récupère `metric.score` et `metric.reason`.
+> Contrairement au TP 03 (qui utilisait `pytest` + `assert_test` pour un gate pass/fail), on a besoin ici de la **valeur numérique** du score (0 → 1) pour la remonter dans Langfuse, et pas uniquement du boolean OK / KO. 
+> 
+> Le pipeline appelle donc directement `metric.measure()` (proposé par DeepEval) et récupère `metric.score` et `metric.reason`.
 
 ---
 
@@ -284,7 +300,7 @@ uv run python eval/step4_production/judge_pipeline.py
 
 ### Objectif
 
-Persister les scores calculés localement avec DeepEval, en s'appuyant sur **la feature Scores de Langfuse**, pour les analyser dans le temps.
+Persister les scores calculés localement avec DeepEval, en s'appuyant sur **la feature "Scores" de Langfuse**, pour les analyser dans le temps.
 
 ### 🔎 Pourquoi persister et versionner les évals ?
 
@@ -299,14 +315,14 @@ Dans un cadre industriel, garder ses évaluations dans un coin de terminal ne su
 
 La bonne pratique veut qu'un **Score** a un `name`, une `value`, un `data_type` et peut être rattaché à une **trace** via son `trace_id`.
 
-Comme on part de **vraies traces** (on a leur `trace_id`), la pratique la plus propre est de **rattacher chaque score à sa trace d'origine** avec [`create_score`](https://langfuse.com/docs/evaluation/evaluation-methods/scores-via-sdk). C'est exactement ça l'évaluation « en ligne ».
+Comme on part de **vraies traces** (on a leur `trace_id`), la pratique la plus propre est de **rattacher chaque score à sa trace d'origine** avec [`create_score`](https://langfuse.com/docs/evaluation/evaluation-methods/scores-via-sdk). 
 
 > [!IMPORTANT]
 > Par défaut, Langfuse autorise **plusieurs scores du même `name` sur une même trace**. C'est ce qui te permet de **relancer le run plus tard** (juge modifié, nouvelles traces) et de **suivre l'évolution dans le temps** — exactement l'objectif visé.
 
 ### 👨‍💻 La démarche, pas à pas
 
-Le pipeline [`judge_pipeline.py`](../eval/step4_production/judge_pipeline.py) fait tout en une passe :
+Le pipeline [`judge_pipeline.py`](../eval/step4_production/judge_pipeline.py) a déjà fait tout ça en une passe :
 
 1. **Charge** le CSV (`input`, `actual_output`, `trace_id`).
 2. Pour chaque ligne, **calcule** les 2 métriques Judge (`metric.measure()` → `score` + `reason`).
@@ -330,21 +346,27 @@ client.create_score(
 
 ### ✅ Visualiser les résultats dans Langfuse
 
-- **Evaluation → Scores** : tu vois apparaître `CorrectnessSupportIT` et `ToneProfessional`, avec leur valeur et leur commentaire.
-- **Tracing** : ouvre une trace évaluée → ses scores sont affichés directement dessus.
-- **Score Analytics** ([doc](https://langfuse.com/docs/evaluation/scores/score-analytics)) : l'évolution des scores **dans le temps**, agrégée par nom de métrique.
+- Navigue dans **Evaluation → Scores** : tu vois apparaître une liste de traces, et les noms de score dans la colonne `name` : `CorrectnessSupportIT` et `ToneProfessional`, avec leur valeur et leur commentaire (scroller horizontalement si besoin).
+- Clique sur une ligne pour ouvrir une trace évaluée → on retourne dans le menu Tracing, et on voit en haut à gauche les scores affichés directement dessus + une info-bulle avec le commentaire (au survol).
+
+Dans le menu **Score**, il y avait aussi un onglet `Analytics` ([doc](https://langfuse.com/docs/evaluation/scores/score-analytics)) : Il permet de visualiser l'évolution des scores **dans le temps**, agrégée par nom de métrique.
+
+> [!TIP]
+> Modifie le prompt du juge `ToneProfessional` dans `judge_metrics.py` pour le rendre plus permissif et augmenter le score (ex: "Evalue le côté professionnel du ton de la réponse").
+>
+> Relance le pipeline :
+> ```bash
+> uv run python eval/step4_production/judge_pipeline.py
+> ```
+> Retourne dans le menu Score > Analytics, sélectionne le score "ToneProfessional", modifie la time frame pour prendre les 30 dernières minutes (en haut à droite), et analyse le dashboard.
 
 ### 🔭 Pour aller plus loin (pour info)
 
-Quelques suites possibles, sans les implémenter ici :
+Quelques suites possibles :
 
-- **Relancer un run après avoir modifié un juge** (nouveau prompt de juge, nouveau seuil) et comparer l'évolution des scores sur les mêmes traces.
-- **Relancer un run sur un dataset enrichi** : ajouter de nouvelles traces de prod au fil de l'eau, puis réévaluer.
-- **Automatiser l'éval en ligne** directement dans Langfuse avec un évaluateur [LLM-as-a-Judge](https://langfuse.com/docs/evaluation/evaluation-methods/llm-as-a-judge) qui score les traces en continu.
+- **Enrichir un dataset hors ligne avec une trace, et relancer un run sur le dataset enrichi** : ajouter de nouvelles traces de prod exportées, puis réévaluer.
+- **Automatiser l'éval en ligne** directement dans Langfuse avec un évaluateur [LLM-as-a-Judge](https://langfuse.com/docs/evaluation/evaluation-methods/llm-as-a-judge) qui score les traces en continu (sans passer par DeepEval), c'est moins flexible mais ça peut suffire.
 - **Versionner un Dataset Langfuse** et lancer des [Experiments](https://langfuse.com/docs/evaluation/experiments/experiments-via-sdk) pour comparer des runs côte à côte (retour vers l'évaluation hors ligne, outillée).
 
 ---
 
-## Solution
-
-Si tu veux comparer ton résultat : `eval/solutions/step4/*`

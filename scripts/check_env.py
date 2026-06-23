@@ -44,11 +44,11 @@ def main() -> int:
 
     missing_optional = _missing(OPTIONAL_LATER)
     if missing_optional:
-        print("Variables Langfuse absentes (uniquement nécessaire pour TP 4):")
+        print("Variables Langfuse : absentes (mais uniquement nécessaire pour TP 4):")
         for item in missing_optional:
             print(f"- {item}")
     else:
-        print("Variables Langfuse: renseignees")
+        print("Variables Langfuse: OK")
 
     provider = os.getenv("LLM_PROVIDER", "")
     embedding_provider = os.getenv("EMBEDDING_PROVIDER", "")
