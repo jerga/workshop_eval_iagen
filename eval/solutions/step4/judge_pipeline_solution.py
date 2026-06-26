@@ -43,8 +43,8 @@ def build_langfuse_client() -> Langfuse | None:
 
 def run() -> int:
     rows = load_rows(DATASET_PATH)
-    correctness_metric = build_correctness_metric()
-    tone_metric = build_tone_metric()
+    correctness_score = build_correctness_metric()
+    tone_score = build_tone_metric()
     client = build_langfuse_client()
 
     pushed = 0
@@ -58,7 +58,7 @@ def run() -> int:
         trace_id = (row.get("trace_id") or "").strip()
         print(f"\n[{row.get('case_id', '?')}] trace_id={trace_id or '(aucun)'}")
 
-        for metric in (correctness_metric, tone_metric):
+        for metric in (correctness_score, tone_score):
             metric.measure(test_case)
             score = float(metric.score or 0.0)
             reason = metric.reason or ""

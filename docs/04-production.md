@@ -14,7 +14,7 @@ Pour cela, on s'appuie sur **Langfuse**.
 >
 > Langfuse est une plateforme open-source d'**observabilité et d'évaluation** pour les applications LLM. Elle est aujourd'hui un outil de référence du domaine. Elle permet de :
 > - **tracer** chaque exécution de ton app IA (entrées, sorties, appels LLM, tokens, coûts, latence) ;
-> - **évaluer** ces exécutions (scores humains, LLM-as-a-Judge, scores calculés par ton code) ;
+> - **évaluer** ces exécutions (scores humains, scores LLM-as-a-Judge, scores calculés par ton code) ;
 > - **versionner** des datasets et comparer des expérimentations dans le temps.
 >
 > Langfuse se décline en deux formats : une version **cloud** managée avec un **free tier** (idéal pour démarrer, c'est ce qu'on utilise dans ce TP), et une version **open-source auto-hébergeable** quasiment aussi riche en features, que tu peux déployer chez toi/sur ton infra.
@@ -225,7 +225,7 @@ En évaluation en ligne, on ne part pas d'un dataset préparé à la main : on p
 
 1. **Exporter** les traces depuis Langfuse via le SDK.
 2. **Formater** ces traces dans le format CSV « judge » des TP précédents.
-3. **Évaluer** avec le pipeline Judge (les 2 métriques du TP 03).
+3. **Évaluer** avec le pipeline Judge (les 2 **métriques** du TP 03).
 
 ### ✅ Exporter les traces via le SDK
 
@@ -325,7 +325,7 @@ Comme on part de **vraies traces** (on a leur `trace_id`), la pratique la plus p
 Le pipeline [`judge_pipeline.py`](../eval/step4_production/judge_pipeline.py) a déjà fait tout ça en une passe :
 
 1. **Charge** le CSV (`input`, `actual_output`, `trace_id`).
-2. Pour chaque ligne, **calcule** les 2 métriques Judge (`metric.measure()` → `score` + `reason`).
+2. Pour chaque ligne, **calcule** les 2 scores Judge (`metric.measure()` → `score` + `reason`).
 3. **Remonte** chaque score sur la trace d'origine :
 
 ```python
@@ -349,7 +349,7 @@ client.create_score(
 - Navigue dans **Evaluation → Scores** : tu vois apparaître une liste de traces, et les noms de score dans la colonne `name` : `CorrectnessSupportIT` et `ToneProfessional`, avec leur valeur et leur commentaire (scroller horizontalement si besoin).
 - Clique sur une ligne pour ouvrir une trace évaluée → on retourne dans le menu Tracing, et on voit en haut à gauche les scores affichés directement dessus + une info-bulle avec le commentaire (au survol).
 
-Dans le menu **Score**, il y avait aussi un onglet `Analytics` ([doc](https://langfuse.com/docs/evaluation/scores/score-analytics)) : Il permet de visualiser l'évolution des scores **dans le temps**, agrégée par nom de métrique.
+Dans le menu **Score**, il y avait aussi un onglet `Analytics` ([doc](https://langfuse.com/docs/evaluation/scores/score-analytics)) : Il permet de visualiser l'évolution des scores **dans le temps**, agrégée par nom de score.
 
 > [!TIP]
 > Modifie le prompt du juge `ToneProfessional` dans `judge_metrics.py` pour le rendre plus permissif et augmenter le score (ex: "Evalue le côté professionnel du ton de la réponse").

@@ -146,3 +146,9 @@ uv run python eval/step1_setup/run_smoke_eval.py
 >- Oublier de renseigner `LLM_API_BASE`, `LLM_API_KEY`, `LLM_MODEL` → le check env t'alertera
 >- Lancer le script depuis un sous-dossier (pas la racine du projet) → les chemins relatifs cassent
 >- Utiliser un provider différent de `openai_compatible`
+
+---
+
+## 🚀 Étape suivante
+
+Ton env est opérationnel ! Découvre les familles d'évaluation : **[TP 02 - Foundations](./02-foundations.md)**

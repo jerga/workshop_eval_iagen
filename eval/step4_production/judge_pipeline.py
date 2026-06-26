@@ -2,7 +2,7 @@
 
 Flux :
 1. Charge le dataset CSV issu des traces (input / actual_output / trace_id).
-2. Calcule localement les 2 métriques GEval du TP 3 (Correctness + Tone).
+2. Calcule localement les 2 scores GEval du TP 3 (Correctness + Tone).
 3. Remonte chaque score sur la trace d'origine via l'API Score de Langfuse
    (langfuse.create_score), pour pouvoir l'analyser dans le temps.
 
@@ -55,8 +55,8 @@ def build_langfuse_client() -> Langfuse | None:
 
 def run() -> int:
     rows = load_rows(DATASET_PATH)
-    correctness_metric = build_correctness_metric()
-    tone_metric = build_tone_metric()
+    correctness_score = build_correctness_metric()
+    tone_score = build_tone_metric()
     client = build_langfuse_client()
 
     pushed = 0
@@ -70,7 +70,7 @@ def run() -> int:
         trace_id = (row.get("trace_id") or "").strip()
         print(f"\n[{row.get('case_id', '?')}] trace_id={trace_id or '(aucun)'}")
 
-        for metric in (correctness_metric, tone_metric):
+        for metric in (correctness_score, tone_score):
             metric.measure(test_case)
             score = float(metric.score or 0.0)
             reason = metric.reason or ""

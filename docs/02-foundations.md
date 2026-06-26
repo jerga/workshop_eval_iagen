@@ -14,11 +14,11 @@ Sur un vrai projet GenAI, la démarche d'évaluation suit un fil logique :
 
 1. **Identifier les exigences** : qu'attend-on vraiment de l'app (qualité, sécurité, fidélité aux sources...) ?
 2. **Choisir les types de tests adaptés** : chaque exigence peut demander d'appeler une famille d'évaluation différente.
-3. **Mettre en œuvre une première version** : on code quelques cas et métriques pour avoir une boucle qui tourne.
+3. **Mettre en œuvre une première version** : on code quelques cas et scores pour avoir une boucle qui tourne.
 4. **Commencer à expérimenter** : on lit les résultats, on ajuste, on mesure l'effet de chaque changement.
 
 > [!NOTE]
-> La **construction du dataset** (cas représentatifs, références attendues) est tout aussi déterminante que le choix des métriques. On l'aborde plus tard, dans les TP suivants. Ici, on travaille sur quelques cas codés en dur pour se concentrer sur les **familles d'évaluation**.
+> La **construction du dataset** (cas représentatifs, références attendues) est tout aussi déterminante que le choix des **métriques**. On l'aborde plus tard, dans les TP suivants. Ici, on travaille sur quelques cas codés en dur pour se concentrer sur les **familles d'évaluation**.
 
 Pour notre cas d'usage — un **agent RAG de support IT** — deux familles de tests sont prioritaires :
 
@@ -32,7 +32,7 @@ On pourrait tout écrire à la main (comme le smoke test du TP 01). Mais dès qu
 Dans ce workshop, on utilise **[DeepEval](https://deepeval.com)**.
 
 > [!NOTE]
-> **DeepEval** est un framework open-source d'évaluation pour applications LLM. Il permet d'écrire des tests sur les sorties LLM façon scripting ou tests unitaires au choix, avec 50+ métriques prêtes à l'emploi. Il est **local-first** : les évaluations peuvent tourner dans ton propre environnement, même si la doc fait souvent référence à Confident.ai (solution commerciale d'évaluation / observabilité s'appuyant sur DeepEval).
+> **DeepEval** est un framework open-source d'évaluation pour applications LLM. Il permet d'écrire des tests sur les sorties LLM façon scripting ou tests unitaires au choix, avec 50+ **métriques** prêtes à l'emploi. Il est **local-first** : les évaluations peuvent tourner dans ton propre environnement, même si la doc fait souvent référence à Confident.ai (solution commerciale d'évaluation / observabilité s'appuyant sur DeepEval).
 
 DeepEval propose deux modes d'usage :
 
@@ -62,7 +62,7 @@ Exemples de critères typiques :
 > [`GEval`](https://deepeval.com/docs/metrics-llm-evals) industrialise cette idée : à partir d'un **critère en langage naturel**, il génère une grille d'évaluation, demande au LLM de noter la réponse, et renvoie un **score normalisé `[0,1]` + une raison**, comparé à un **`threshold`** pour produire un verdict PASS/FAIL. 
 > On obtient ainsi un résultat **structuré, reproductible et comparable**, là où un simple prompt+réponse reste artisanal.
 
-Dans ce TP (arbo `eval/step2_foundations/`), on a préparé une fonction `llm_judge_section()` qui construit deux métriques `GEval` ("ton professionnel", et "présence d'intro+conclusion"), et qui encapsule chaque cas dans un `LLMTestCase`, puis qui lance `evaluate(...)`.
+Dans ce TP (arbo `eval/step2_foundations/`), on a préparé une fonction `llm_judge_section()` qui construit deux **métriques** `GEval` ("ton professionnel", et "présence d'intro+conclusion"), et qui encapsule chaque cas dans un `LLMTestCase`, puis qui lance `evaluate(...)`.
 
 ```mermaid
 sequenceDiagram
@@ -93,12 +93,12 @@ sequenceDiagram
 ### ✅ Explorer le code
 
 1. Ouvre `llm_judge_section()` dans `eval/step2_foundations/basic_eval_examples.py`.
-2. Repère les 2 métriques `GEval` : `ProfessionalTone` et `AnswerStructure`.
+2. Repère les 2 scores `GEval` : `ProfessionalTone` et `AnswerStructure`.
 3. Note les `evaluation_params` de chacune (ProfessionalTone utilise `INPUT` + `ACTUAL_OUTPUT`, AnswerStructure seulement `ACTUAL_OUTPUT` car pas besoin de la question pour vérifier une structure commune de réponse).
 
 > [!NOTE]
 > Mini mémo des fonctions DeepEval citées ici :
-> - [`GEval`](https://deepeval.com/docs/metrics-llm-evals) : crée une métrique LLM-as-a-Judge à partir d'un critère en langage naturel et d'un seuil.
+> - [`GEval`](https://deepeval.com/docs/metrics-llm-evals) : crée une **métrique** LLM-as-a-Judge à partir d'un critère en langage naturel et d'un seuil.
 > - [`LLMTestCase`](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) : encapsule le cas à évaluer (input, réponse, contexte éventuel).
 > - [`SingleTurnParams`](https://deepeval.com/docs/metrics-llm-evals#evaluation-params) : indique à `GEval` quels champs du test case sont évalués.
 > - [`evaluate(...)`](https://deepeval.com/docs/evaluation-introduction#evaluating-without-pytest) : exécute les mesures et retourne le résultat détaillé.
@@ -154,7 +154,7 @@ Le **Grounding** répond à une question simple : « **la réponse reste-t-elle 
 
 C'est **important sur un cas d'usage RAG** : le risque principal n'est pas une réponse mal écrite, mais une réponse fluide et convaincante qui **ajoute des informations absentes du contexte** (hallucination).
 
-Dans ce TP, on utilise la métrique DeepEval `FaithfulnessMetric`, qui mesure la fidélité de la réponse vis-à-vis du `retrieval_context`. La fonction `grounding_faithfulness_section()` récupère la réponse **et** le contexte de l'agent, les place dans un `LLMTestCase`, puis lance `evaluate(...)`.
+Dans ce TP, on utilise la **métrique** DeepEval `FaithfulnessMetric`, qui mesure la fidélité de la réponse vis-à-vis du `retrieval_context`. La fonction `grounding_faithfulness_section()` récupère la réponse **et** le contexte de l'agent, les place dans un `LLMTestCase`, puis lance `evaluate(...)`.
 
 ```mermaid
 sequenceDiagram
@@ -175,7 +175,7 @@ sequenceDiagram
 ```
 
 > [!NOTE]
-> Le champ clé ici est `retrieval_context` : la liste des passages récupérés sur lesquels la réponse doit s'appuyer. Sans lui, la métrique de faithfulness n'a rien à comparer.
+> Le champ clé ici est `retrieval_context` : la liste des passages récupérés sur lesquels la réponse doit s'appuyer. Sans lui, le score de faithfulness n'a rien à comparer.
 
 
 🔎 **D'où vient le `retrieval_context` ?** On part de l'hypothèse que **notre agent est bien conçu**, et expose lui-même la réponse **et** les passages qu'il a récupérés pour la produire. C'est une **bonne pratique** (appliquée par tous les frameworks standards) : un agent qui retourne son contexte de récupération est bien plus facile à évaluer et à tracer (on reverra ce point en parlant observabilité au TP 04).
@@ -186,7 +186,7 @@ On a modélisé cela dans `get_agent_answer_and_context(question)`, qui appelle 
 > Mini mémo :
 > - [`FaithfulnessMetric`](https://deepeval.com/docs/metrics-faithfulness) : mesure si la réponse reste fidèle aux sources (pas d'ajout non supporté par le contexte).
 > - [`LLMTestCase`](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) avec `retrieval_context` : fournit au juge les passages à vérifier.
-> - [`evaluate(...)`](https://deepeval.com/docs/evaluation-introduction#evaluating-without-pytest) : exécute la métrique et fournit le verdict PASS/FAIL selon le seuil.
+> - [`evaluate(...)`](https://deepeval.com/docs/evaluation-introduction#evaluating-without-pytest) : exécute le score et fournit le verdict PASS/FAIL selon le seuil.
 
 ### ✅ Explorer le code
 
@@ -195,9 +195,9 @@ On a modélisé cela dans `get_agent_answer_and_context(question)`, qui appelle 
 3. Plus de détails dans la [documentation DeepEval FaithfulnessMetric](https://deepeval.com/docs/metrics-faithfulness).
 
 > [!NOTE]
-> Autres métriques utiles de la même famille (Grounding / RAG) :
+> Autres scores utiles de la même famille (Grounding / RAG) :
 >
-> | Métrique DeepEval | Ce que ça mesure | Quand l'utiliser |
+> | Score DeepEval | Ce que ça mesure | Quand l'utiliser |
 > |---|---|---|
 > | [`Answer Relevancy`](https://deepeval.com/docs/metrics-answer-relevancy) | Si la réponse répond vraiment à la question | Réponses hors-sujet, même « factuellement correctes » |
 > | [`Contextual Relevancy`](https://deepeval.com/docs/metrics-contextual-relevancy) | Si le contexte récupéré est pertinent pour la question | Retriever qui remonte de « bons » documents mais pas les bons |
@@ -213,7 +213,7 @@ On a modélisé cela dans `get_agent_answer_and_context(question)`, qui appelle 
 
 👨‍💻 Un TODO a été ajouté, **complète le code** :
 
-1. `TODO-03` : calibre le seuil de faithfulness en définissant un niveau de risque acceptable. Consulte la doc de la métrique si besoin.
+1. `TODO-03` : calibre le seuil de faithfulness en définissant un niveau de risque acceptable. Consulte la doc du score si besoin.
 
 > [!NOTE]
 > Pour exécuter cette section du script, lance :  
@@ -236,3 +236,8 @@ N'hésite pas à tester d'autres questions en prenant un thème qui n'existe dan
 > Le but de l’étape n’est pas d’obtenir 100% de vert. Le but, c’est de comprendre **pourquoi** un test échoue et **quelle action produit une amélioration mesurable**.
 
 Si tu veux comparer ton résultat : `eval/solutions/step2/basic_eval_examples_solution.py`
+---
+
+## 🚀 Étape suivante
+
+T'as compris les bases ! Passe à l'industrialisation : **[TP 03 - Industrialization](./03-industrialization.md)**

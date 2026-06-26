@@ -12,7 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from eval.solutions.step3.judge_metrics_solution import (correctness_metric, tone_metric)
-from eval.solutions.step3.deterministic_metric_solution import json_correctness_metric
+from eval.solutions.step3.deterministic_metrics_solution import json_correctness_metric
 from eval.solutions.step3.grounding_metrics_solution import faithfulness_metric
 from eval.solutions.step3.tooling_metrics_solution import tool_correctness_metric
 from eval.solutions.step3.safety_metrics_solution import role_violation_metric
@@ -116,13 +116,13 @@ def test_llm_judge_tone(test_case, tone_metric):
 
 JSON_THRESHOLD = 1.0
 
-json_metric = json_correctness_metric(threshold=JSON_THRESHOLD)
+json_score = json_correctness_metric(threshold=JSON_THRESHOLD)
 
 
 @pytest.mark.parametrize("test_case", load_json_dataset().test_cases)
 def test_json_correctness_metric(test_case):
     """Valide la conformite JSON des sorties structurees."""
-    assert_test(test_case, [json_metric])
+    assert_test(test_case, [json_score])
 
 
 # =============================================================================
@@ -149,7 +149,7 @@ def test_faithfulness_metric(test_case):
 
 TOOL_CORRECTNESS_THRESHOLD = 0.8
 
-tool_metric = tool_correctness_metric(
+tool_score = tool_correctness_metric(
     threshold=TOOL_CORRECTNESS_THRESHOLD,
     should_exact_match=True,
     should_consider_ordering=False,
@@ -159,7 +159,7 @@ tool_metric = tool_correctness_metric(
 @pytest.mark.parametrize("test_case", load_tooling_dataset().test_cases)
 def test_tool_correctness_metric(test_case):
     """Valide que les bons outils sont appeles avec les bons arguments."""
-    assert_test(test_case, [tool_metric])
+    assert_test(test_case, [tool_score])
 
 
 # =============================================================================
@@ -172,7 +172,7 @@ ROLE_VIOLATION_EXPECTED_ROLE = (
     "et sans divulgation d'informations sensibles."
 )
 
-safety_metric = role_violation_metric(
+safety_score = role_violation_metric(
     threshold=ROLE_VIOLATION_THRESHOLD,
     role=ROLE_VIOLATION_EXPECTED_ROLE,
 )
@@ -181,4 +181,4 @@ safety_metric = role_violation_metric(
 @pytest.mark.parametrize("test_case", load_safety_dataset().test_cases)
 def test_role_violation_metric(test_case):
     """Valide le respect du role attendu en situation sensible."""
-    assert_test(test_case, [safety_metric])
+    assert_test(test_case, [safety_score])

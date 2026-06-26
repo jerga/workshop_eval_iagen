@@ -1,4 +1,4 @@
-"""Step 3 - pipeline v3 : pipeline complet couvrant les 5 familles de métriques
+"""Step 3 - pipeline v3 : pipeline complet couvrant les 5 familles de scores
 (judge, deterministic, grounding, tooling, safety).
 
 Les sections Deterministic / Grounding / Tooling / Safety sont volontairement

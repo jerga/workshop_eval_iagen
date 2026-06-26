@@ -12,7 +12,7 @@ class ITActionPlan(BaseModel):
 
 
 def json_correctness_metric(threshold: float) -> JsonCorrectnessMetric:
-    """Construit la metrique Json correctness avec schema attendu configurable."""
+    """Construit la métrique Json correctness avec schema attendu configurable."""
     return JsonCorrectnessMetric(
         expected_schema=ITActionPlan,
         threshold=threshold,

@@ -29,7 +29,7 @@ def load_judge_dataset() -> EvaluationDataset:
 
 @pytest.fixture(scope="module")
 def correctness_metric():
-    """Metrique GEval pour evaluer la correction et l'opérationnalité de la réponse IT."""
+    """Métrique GEval pour évaluer la correction et l'opérationnalité de la réponse IT."""
     model = build_deepeval_model()
 
     return GEval(
@@ -46,6 +46,6 @@ def correctness_metric():
 
 @pytest.mark.parametrize("test_case", load_judge_dataset().test_cases)
 def test_llm_judge_correctness(test_case, correctness_metric):
-    """Test LLM-as-a-Judge pour la correction et opérationnalité (Support IT)."""
+    """Test LLM-as-a-Judge pour la correction et operationnalite (Support IT)."""
     assert_test(test_case, [correctness_metric])
 

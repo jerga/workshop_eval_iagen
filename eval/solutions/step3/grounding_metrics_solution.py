@@ -8,7 +8,7 @@ def faithfulness_metric(
     threshold: float,
     truths_extraction_limit: int = 4,
 ) -> FaithfulnessMetric:
-    """Construit la metrique Faithfulness pour vérifier l'ancrage au contexte RAG."""
+    """Construit la métrique Faithfulness pour vérifier l'ancrage au contexte RAG."""
     model = build_deepeval_model()
     return FaithfulnessMetric(
         model=model,

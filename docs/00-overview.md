@@ -1,4 +1,4 @@
-# Workshop — Évaluation d'une application GenAI
+# Workshop — Construisez votre stack d'évaluation IA Gen
 
 Bienvenue ! Ce workshop t'apprend à évaluer une application IA Gen de façon progressive — de zéro jusqu'à une vraie démarche industrielle.
 
@@ -81,3 +81,9 @@ docs/                       → tu es ici 👋
 Chaque TP dispose d'une version solution exécutable dans `eval/solutions/`.
 
 💡 Utilise les solutions pour débloquer si besoin — mais essaie d'abord !
+
+---
+
+## 🚀 Étape suivante
+
+C'est parti ! Commence par vérifier ton environnement : **[TP 01 - Setup](./01-setup.md)**

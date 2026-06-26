@@ -9,7 +9,7 @@ def tool_correctness_metric(
     should_exact_match: bool = True,
     should_consider_ordering: bool = False,
 ) -> ToolCorrectnessMetric:
-    """Construit la metrique Tool correctness pour valider les outils appeles."""
+    """Construit la métrique Tool correctness pour valider les outils appeles."""
     return ToolCorrectnessMetric(
         threshold=threshold,
         should_exact_match=should_exact_match,

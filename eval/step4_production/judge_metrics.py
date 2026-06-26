@@ -1,11 +1,13 @@
-"""Step 4 - métriques LLM-as-a-Judge reprises du TP 3.
+"""Step 4 - Métriques LLM-as-a-Judge repris du TP 3.
 
-On ne garde que les 2 métriques GEval utilisées au TP 3 :
+On ne garde que les 2 métriques GEval utilisés au TP 3 :
 - CorrectnessSupportIT : correction / opérationnalité de la réponse
 - ToneProfessional     : ton professionnel et courtois
 
 Contrairement au TP 3 (fixtures pytest), on expose ici de simples fonctions
-de fabrique : le pipeline du step 4 est un script, pas une suite pytest.
+de fabrique (build_*_metric) qui retournent les instances de métriques.
+Le pipeline du step 4 est un script, pas une suite pytest, donc on utilise
+des variables nommées en *_score pour stocker les instances de métriques.
 """
 from __future__ import annotations
 

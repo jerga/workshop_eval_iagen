@@ -18,9 +18,7 @@ Tu pars d'un pipeline simple et tu ajoutes progressivement des briques d'évalua
 
 Dans cette première étape, tu travailles sur le chargement d'un dataset. On reste pour l'instant sur un type d'éval LLM-as-a-Judge (ici un juge `correctness`).  
 
-L'objectif est de poser un socle propre avant d'ajouter d'autres métriques et familles de tests.
-
-### ✅ Comprendre le contexte
+L'objectif est de poser un socle propre avant d'ajouter d'autres **métriques** et familles de tests.
 
 1. Ouvre `test_pipeline_v1.py`.
 2. Repère la fonction `load_judge_dataset`.
@@ -82,9 +80,9 @@ dataset.add_test_cases_from_csv_file(
 1. Lis le bloc `test_llm_judge_correctness`.
 2. Identifie :
 	- l'annotation `@pytest.mark.parametrize`
-	- la métrique `GEval`
+	- la **métrique** `GEval`
 	- l'assertion `assert_test`
-3. Complète le TODO du `threshold` dans `GEval` : ajoute un `threshold` pertinent à cette métrique de type LLM-as-a-Judge (voir TP précédent si besoin).
+3. Complète le TODO du `threshold` dans `GEval` : ajoute un `threshold` pertinent à cette **métrique** de type LLM-as-a-Judge (voir TP précédent si besoin).
 
 > [!NOTE]
 > `pytest` + `assert_test` + commande `deepeval test run` s'intègre naturellement à une logique de pipeline de tests.
@@ -107,7 +105,7 @@ python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipelin
 > L'argument `--tb=no` de la commande `deepeval test run` permet de masquer les stacktrace d'erreur (en cas d'échec d'un test)
 
 > [!NOTE]
-> Tu peux constater que le reporting d'exécution est structuré et détaillé. Ce format est standard quelle que soit la métrique.
+> Tu peux constater que le reporting d'exécution est structuré et détaillé. Ce format est standard quel que soit le type de **métrique**.
 
 > [!TIP]
 > Il es possible de récupérer le résultat complet au format JSON sous le répertoire `.deepeval` (`.latest_run_full`).
@@ -122,20 +120,20 @@ Dans cette étape, tu rends le pipeline plus modulaire et les types de tests plu
 
 ### ✅ Analyser et compléter le refactoring
 
-Objectif : rendre le juge `correctness` générique et laisser la configuration du niveau d'exigence dans le pipeline (`threshold`).
+Objectif : rendre la **métrique** `correctness` générique et laisser la configuration du niveau d'exigence dans le pipeline (`threshold`).
 
 1. On a déjà préparé le travail et créé un module dédié (`judge_metrics.py`) avec la fonction correspondante du pipeline v1.
 2. Rends le `threshold` configurable dans `correctness_metric` de `judge_metrics.py` pour que ce module reste générique.
 3. Dans `test_pipeline_v2.py`, on a déjà configuré l'import du module. Repère comment la référence vers `correctness_metric` est faite et ajoute la valeur de seuil à passer.
 
 > [!NOTE]
-> Le service métrique doit rester générique : il expose une construction configurable, et le pipeline décide du niveau d'exigence (`threshold`).
+> Le service de **métrique** doit rester générique : il expose une construction configurable, et le pipeline décide du niveau d'exigence (`threshold`).
 
 <details>
 <summary>Solution (cliquer pour afficher)</summary>
 
 ```python
-# Côté définition de métrique (judge_metrics.py)
+# Côté définition de **métrique** (judge_metrics.py)
 def correctness_metric(threshold: float) -> GEval:
 	...
 
@@ -154,7 +152,7 @@ assert_test(test_case, [correctness_metric(threshold=CORRECTNESS_THRESHOLD)])
 
 Ajoute une seconde évaluation, sur la qualité du ton professionnel, en reprenant le même pattern que correctness.
 
-1. Ajoute la métrique `tone_metric` dans le module `judge_metrics.py`.
+1. Ajoute la **métrique** `tone_metric` dans le module `judge_metrics.py`.
 2. Importe-la dans `test_pipeline_v2.py`.
 3. Ajoute un second test `pytest` paramétré sur le même dataset.
 
@@ -221,13 +219,13 @@ Tu as maintenant compris la logique, on peut maintenant passer à l'échelle et 
 > [!NOTE]
 > Si au lieu de continuer à découvrir d'autres types d'évaluation, tu préfères basculer sur le monde de l'évaluation "en ligne", et le lien avec l'observabilité, passe directement au TP 04 - Production.
 
-## Étape 3 - Ajouter de nouvelles métriques, pipeline v3
+## Étape 3 - Ajouter de nouvelles **métriques**, pipeline v3
 
 ### Objectif
 
 Dans cette étape, tu passes à une solution multi-modules avec des datasets dédiés par type d'évaluation.
 
-Le but est de conserver des services métriques génériques, et de gérer le spécifique (seuils, paramètres, wiring) dans le pipeline v3.
+Le but est de conserver des services de **métrique** génériques, et de gérer le spécifique (seuils, paramètres, wiring) dans le pipeline v3.
 
 ### ✅ Contexte et fichiers
 
@@ -245,7 +243,7 @@ Le but est de conserver des services métriques génériques, et de gérer le sp
 4. Ces datasets sont déjà créés et déjà importés dans le pipeline v3 via les fonctions de chargement dédiées.
 
 > [!NOTE]
-> Dans cette étape, tu ne crées pas les datasets depuis zéro : ils sont déjà créés et déjà importés dans le pipeline. Tu les analyses et tu branches les services métriques correspondants.
+> Dans cette étape, tu ne crées pas les datasets depuis zéro : ils sont déjà créés et déjà importés dans le pipeline. Tu les analyses et tu branches les services de **métrique** correspondants.
 
 ---
 
@@ -253,7 +251,7 @@ Le but est de conserver des services métriques génériques, et de gérer le sp
 
 **Objectif** : valider que l'agent retourne bien un JSON conforme au format attendu si on lui demande.
 
-Tu n'es bien sûr pas obligé d'utiliser DeepEval pour ce type de contrôle (une validation JSON/Pydantic pure suffirait), mais l'intérêt ici est de l'intégrer au même pipeline d'évaluation pour obtenir un résultat unifié, visible dans le même rapport que les autres métriques.
+Tu n'es bien sûr pas obligé d'utiliser DeepEval pour ce type de contrôle (une validation JSON/Pydantic pure suffirait), mais l'intérêt ici est de l'intégrer au même pipeline d'évaluation pour obtenir un résultat unifié, visible dans le même rapport que les autres scores.
 
 > [!NOTE]
 > Documentation Json correctness : https://deepeval.com/docs/metrics-json-correctness
@@ -315,7 +313,7 @@ Objectif : vérifier que les réponses sont bien produites à partir du contexte
 > [!NOTE]
 > Documentation Faithfulness : https://deepeval.com/docs/metrics-faithfulness
 >
-> Autres métriques de grounding possibles : Contextual Precision, Contextual Recall, Contextual Relevancy.
+> Autres **métriques** de grounding possibles : Contextual Precision, Contextual Recall, Contextual Relevancy.
 
 1. Crée le module `grounding_metrics.py`.
 2. Analyse `grounding_faithfulness_cases.csv` et identifie les colonnes importantes :
@@ -329,7 +327,7 @@ Objectif : vérifier que les réponses sont bien produites à partir du contexte
 > Ce type de dataset peut être produit à partir de runs de l'agent et de récupération des traces de retrieval. On couvrira cette industrialisation dans le TP suivant.
 
 > [!TIP]
-> La métrique est personnalisable (voir docs), par exemple :
+> La **métrique** est personnalisable (voir docs), par exemple :
 > - `truths_extraction_limit` pour contrôler le nombre de faits extraits du contexte (granularité d'analyse)
 > - `penalize_ambiguous_claims` pour durcir l'évaluation sur les affirmations ambiguës
 >
@@ -378,7 +376,7 @@ Objectif : vérifier que les outils attendus sont bien appelés par l'agent, ave
 > [!NOTE]
 > Documentation Tool correctness : https://deepeval.com/docs/metrics-tool-correctness
 >
-> Autres métriques de type Agent possibles : Task Completion, Knowledge Retention, Turn Relevancy, Turn Faithfulness.
+> Autres **métriques** de type Agent possibles : Task Completion, Knowledge Retention, Turn Relevancy, Turn Faithfulness.
 
 1. Crée le module `tooling_metrics.py`.
 2. Analyse `tooling_correctness_cases.csv` et identifie les colonnes importantes :
@@ -393,7 +391,7 @@ Objectif : vérifier que les outils attendus sont bien appelés par l'agent, ave
 > Ce contenu peut aussi être généré à partir de runs de l'agent et de récupération des traces agentiques. On détaillera ce workflow dans le TP suivant.
 
 > [!TIP]
-> La métrique propose des options utiles (voir docs), par exemple :
+> La **métrique** propose des options utiles (voir docs), par exemple :
 > - `should_exact_match` pour imposer une correspondance stricte entre outils appelés et attendus
 > - `should_consider_ordering` pour vérifier l'ordre des appels
 >
@@ -443,7 +441,7 @@ Objectif : vérifier le bon comportement de l'agent en cas de tentative de le fa
 > [!NOTE]
 > Documentation Role violation : https://deepeval.com/docs/metrics-role-violation
 >
-> Autres métriques de type Safety possibles : Bias, Toxicity, Hallucination, Prompt Alignment, PII Leakage.
+> Autres **métriques** de type Safety possibles : Bias, Toxicity, Hallucination, Prompt Alignment, PII Leakage.
 
 1. Crée le module `safety_metrics.py`.
 2. Analyse `role_violation_cases.csv` et identifie les colonnes importantes :
@@ -498,7 +496,7 @@ def test_role_violation_metric(test_case):
 
 ### ✅ Vérifier le pipeline v3
 
-Au fur et à mesure de l'avancement, relance le pipeline v3 avec l'ensemble des métriques.
+Au fur et à mesure de l'avancée, relance le pipeline v3 avec l'ensemble des **métriques**.
 
 ```bash
 deepeval test run ./eval/step3_industrialization/test_pipeline_v3.py --tb=no
@@ -510,3 +508,9 @@ python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipelin
 ## Solution
 
 Si tu veux comparer ton résultat : `eval/solutions/step3/*`
+
+---
+
+## 🚀 Étape suivante
+
+Tu as industrialisé tes évaluations ! Passe maintenant à l'observabilité et l'évaluation en ligne : **[TP 04 - Observabilité & évaluation en ligne](./04-production.md)**

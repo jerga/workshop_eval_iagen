@@ -1,4 +1,8 @@
-"""Step 4 (solution) - métriques LLM-as-a-Judge reprises du TP 3."""
+"""Solution Step 4 - Métriques LLM-as-a-Judge repris du TP 3.
+
+Fonctions de fabrique (build_*_metric) qui retournent les instances de métriques
+GEval. Les variables résultat sont nommées en *_score pour clarifier qu'elles
+contiennent des instances de métriques de notation."""
 from __future__ import annotations
 
 from pathlib import Path

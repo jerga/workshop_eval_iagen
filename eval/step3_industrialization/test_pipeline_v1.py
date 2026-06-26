@@ -1,7 +1,7 @@
 """Step 3 - pipeline v1 : premier test pytest + DeepEval, juge "correctness" seul.
 
 Le dataset CSV est transformé en test cases ; chaque cas devient un test
-paramétré. assert_test échoue si le score de la métrique passe sous le seuil.
+paramétré. assert_test échoue si la valeur du score passe sous le seuil.
 """
 from __future__ import annotations
 from pathlib import Path
@@ -33,7 +33,7 @@ def load_judge_dataset() -> EvaluationDataset:
 def test_llm_judge_correctness(test_case):
     """Test LLM-as-a-Judge pour la correction et opérationnalité (Support IT)."""
     model = build_deepeval_model()
-    correctness_metric = GEval(
+    correctness_score = GEval(
         name="CorrectnessSupportIT",
         criteria=(
             "Vérifie que la réponse est correcte et opérationnelle pour un contexte "
@@ -43,5 +43,5 @@ def test_llm_judge_correctness(test_case):
         model=model,
         # TODO: Definir un threshold adapté au niveau d'exigence souhaité.
     )
-    assert_test(test_case, [correctness_metric])
+    assert_test(test_case, [correctness_score])
 

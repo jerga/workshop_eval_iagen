@@ -33,7 +33,7 @@ def llm_judge_section() -> list[bool]:
     answer, _ = get_agent_answer_and_context(question)
 
     # TODO-01 (solution): prompt juge precis pour le ton professionnel en contexte IT.
-    tone_metric = GEval(
+    tone_score = GEval(
         name="ProfessionalTone",
         model=model,
         criteria=(
@@ -45,7 +45,7 @@ def llm_judge_section() -> list[bool]:
     )
 
     # TODO-02 (solution): consigne explicite sur formule d'intro et formule de conclusion.
-    formula_metric = GEval(
+    formula_score = GEval(
         name="AnswerStructure",
         model=model,
         criteria=(
@@ -59,8 +59,8 @@ def llm_judge_section() -> list[bool]:
     case_tone = LLMTestCase(input=question, actual_output=answer)
     case_formula = LLMTestCase(input=question, actual_output=answer)
 
-    tone_result = evaluate(test_cases=[case_tone], metrics=[tone_metric], display_config=DisplayConfig(print_results=True))
-    formula_result = evaluate(test_cases=[case_formula], metrics=[formula_metric], display_config=DisplayConfig(print_results=True))
+    tone_result = evaluate(test_cases=[case_tone], metrics=[tone_score], display_config=DisplayConfig(print_results=True))
+    formula_result = evaluate(test_cases=[case_formula], metrics=[formula_score], display_config=DisplayConfig(print_results=True))
 
     tone_ok = bool(tone_result.test_results[0].success)
     formula_ok = bool(formula_result.test_results[0].success)
@@ -76,10 +76,10 @@ def grounding_faithfulness_section() -> list[bool]:
     answer, retrieval_context = get_agent_answer_and_context(question)
 
     # TODO-03 (solution): seuil de faithfulness calibre sur la tolerance au risque d'hallucination.
-    faithfulness_metric = FaithfulnessMetric(threshold=0.8, model=model)
+    faithfulness_score = FaithfulnessMetric(threshold=0.8, model=model)
 
     case = LLMTestCase(input=question, actual_output=answer, retrieval_context=retrieval_context)
-    result = evaluate(test_cases=[case], metrics=[faithfulness_metric], display_config=DisplayConfig(print_results=True))
+    result = evaluate(test_cases=[case], metrics=[faithfulness_score], display_config=DisplayConfig(print_results=True))
     return [bool(result.test_results[0].success)]
 
 
