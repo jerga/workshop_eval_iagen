@@ -67,23 +67,23 @@ scripts/
   check_env.py              → vérifie que l'environnement est correctement configuré
   verify_workshop.py        → vérification globale du workshop
 
-docs/                       → tu es ici 👋
+docs/                       → tu es ici
 ```
 
 ## Progression
 
-1. **01 - Setup** : vérifier que l'env tourne sur un cas simple déterministe
-2. **02 - Foundations** : comprendre et implémenter les principales familles d'évaluation
-3. **03 - Industrialization** : structurer un pipeline de non-régression avec un approche modulaire et DeepEval
-4. **04 - Production** : ajouter Langfuse pour le suivi, les traces et les expérimentations
+1. **TP 01 — Mise en place** : vérifier que l'env tourne sur un cas simple déterministe
+2. **TP 02 — Fondations** : comprendre et implémenter les principales familles d'évaluation
+3. **TP 03 — Industrialisation** : structurer un pipeline de non-régression avec une approche modulaire et DeepEval
+4. **TP 04 — Observabilité & évaluation en ligne** : ajouter Langfuse pour le suivi, les traces et les expérimentations
 
 
 Chaque TP dispose d'une version solution exécutable dans `eval/solutions/`.
 
-💡 Utilise les solutions pour débloquer si besoin — mais essaie d'abord !
+Utilise les solutions pour débloquer si besoin — mais essaie d'abord !
 
 ---
 
 ## 🚀 Étape suivante
 
-C'est parti ! Commence par vérifier ton environnement : **[TP 01 - Setup](./01-setup.md)**
+C'est parti ! Commence par vérifier ton environnement : **[TP 01 — Mise en place](./01-setup.md)**

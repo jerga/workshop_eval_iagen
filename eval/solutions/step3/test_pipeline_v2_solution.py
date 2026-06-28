@@ -17,7 +17,7 @@ from deepeval.dataset import EvaluationDataset
 from deepeval import assert_test
 
 DATASET_PATH = (
-    PROJECT_ROOT / "eval" / "step3_industrialization" / "datasets" / "judge_case.csv"
+    PROJECT_ROOT / "eval" / "step3_industrialization" / "datasets" / "judge_cases.csv"
 )
 
 

@@ -1,6 +1,6 @@
-# 01 — Setup
+# 🛠️ TP 01 — Mise en place
 
-## 📚 Contexte
+## 📚 Ressources du TP
 
 - Répertoire de travail : `eval/step1_setup`
 
@@ -93,7 +93,7 @@ Tu dois obtenir une réponse cohérente en français sur la réinitialisation de
 
 ## Étape 5 — Implémenter le smoke eval
 
-### Objectif
+### 🔎 Objectif
 
 On veut un **test simple et déterministe** : vérifier que la réponse de l'agent contient bien les **mots-clés attendus**. 
 
@@ -106,7 +106,7 @@ Le principe est volontairement minimal, et lisible via le `main()` dans [`eval/s
 > [!NOTE]
 > Tout est **scripté en vanilla** (Python standard, pas de framework d'évaluation). Ce n'est pas le but à cette étape : on cherche surtout à valider que la chaîne complète tourne de bout en bout.
 
-### Déroulé du script
+### 🔎 Déroulé du script
 
 ```mermaid
 sequenceDiagram
@@ -128,7 +128,7 @@ sequenceDiagram
 ```
 
 
-### Lancer le script de test
+### ✅ Lancer le script de test
 
 ```bash
 uv run python eval/step1_setup/run_smoke_eval.py
@@ -151,4 +151,4 @@ uv run python eval/step1_setup/run_smoke_eval.py
 
 ## 🚀 Étape suivante
 
-Ton env est opérationnel ! Découvre les familles d'évaluation : **[TP 02 - Foundations](./02-foundations.md)**
+Ton env est opérationnel ! Découvre les familles d'évaluation : **[TP 02 — Fondations](./02-foundations.md)**

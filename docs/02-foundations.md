@@ -1,12 +1,12 @@
-# 02 — Foundations
+# 🧱 TP 02 — Fondations
 
 ## 📚 Ressources du TP
 
-- Répertoire de travail : eval/step2_foundations
+- Répertoire de travail : `eval/step2_foundations`
 - DeepEval docs (officiel) : [Overview](https://deepeval.com/docs/introduction), [LLM-as-a-Judge / GEval](https://deepeval.com/docs/metrics-llm-evals), [Grounding / Faithfulness](https://deepeval.com/docs/metrics-faithfulness).
 
 > [!NOTE]
-> Cette étape ne refait pas le setup d’environnement. Si ton env n’est pas prêt, repasse par le TP 01 - Setup.
+> Cette étape ne refait pas le setup d'environnement. Si ton env n'est pas prêt, repasse par le TP 01 — Mise en place.
 
 ## Introduction
 
@@ -25,7 +25,7 @@ Pour notre cas d'usage — un **agent RAG de support IT** — deux familles de t
 - **LLM-as-a-Judge** : un LLM joue le rôle de relecteur qualité pour des critères qui ne s'expriment pas par une règle simple. Indispensable car ces exigences sont subjectives et dépendent du contexte métier.
 - **Grounding** : on vérifie que la réponse reste **fidèle au contexte récupéré**, sans inventer. C'est central sur un RAG, où le risque principal est l'hallucination malgré une réponse bien rédigée.
 
-### Pourquoi un framework d'évaluation ?
+### 🔎 Pourquoi un framework d'évaluation ?
 
 On pourrait tout écrire à la main (comme le smoke test du TP 01). Mais dès qu'on multiplie les cas et les critères, un framework apporte : des **métriques prêtes à l'emploi**, une façon **standardisée** de décrire les cas de test, un **seuil PASS/FAIL** homogène, et un **reporting** lisible et comparable d'un run à l'autre.
 
@@ -62,7 +62,7 @@ Exemples de critères typiques :
 > [`GEval`](https://deepeval.com/docs/metrics-llm-evals) industrialise cette idée : à partir d'un **critère en langage naturel**, il génère une grille d'évaluation, demande au LLM de noter la réponse, et renvoie un **score normalisé `[0,1]` + une raison**, comparé à un **`threshold`** pour produire un verdict PASS/FAIL. 
 > On obtient ainsi un résultat **structuré, reproductible et comparable**, là où un simple prompt+réponse reste artisanal.
 
-Dans ce TP (arbo `eval/step2_foundations/`), on a préparé une fonction `llm_judge_section()` qui construit deux **métriques** `GEval` ("ton professionnel", et "présence d'intro+conclusion"), et qui encapsule chaque cas dans un `LLMTestCase`, puis qui lance `evaluate(...)`.
+Dans ce TP (arbo `eval/step2_foundations/`), on a préparé une fonction `llm_judge_section()` qui construit deux métriques `GEval` ("ton professionnel", et "présence d'intro+conclusion"), et qui encapsule chaque cas dans un `LLMTestCase`, puis qui lance `evaluate(...)`.
 
 ```mermaid
 sequenceDiagram
@@ -98,12 +98,12 @@ sequenceDiagram
 
 > [!NOTE]
 > Mini mémo des fonctions DeepEval citées ici :
-> - [`GEval`](https://deepeval.com/docs/metrics-llm-evals) : crée une **métrique** LLM-as-a-Judge à partir d'un critère en langage naturel et d'un seuil.
+> - [`GEval`](https://deepeval.com/docs/metrics-llm-evals) : crée une métrique LLM-as-a-Judge à partir d'un critère en langage naturel et d'un seuil.
 > - [`LLMTestCase`](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) : encapsule le cas à évaluer (input, réponse, contexte éventuel).
 > - [`SingleTurnParams`](https://deepeval.com/docs/metrics-llm-evals#evaluation-params) : indique à `GEval` quels champs du test case sont évalués.
 > - [`evaluate(...)`](https://deepeval.com/docs/evaluation-introduction#evaluating-without-pytest) : exécute les mesures et retourne le résultat détaillé.
 
-### ✅ Tester par soit même
+### ✅ Tester par soi-même
 
 👨‍💻 Des TODOs ont été ajoutés, **complète le code** :
 
@@ -154,7 +154,7 @@ Le **Grounding** répond à une question simple : « **la réponse reste-t-elle 
 
 C'est **important sur un cas d'usage RAG** : le risque principal n'est pas une réponse mal écrite, mais une réponse fluide et convaincante qui **ajoute des informations absentes du contexte** (hallucination).
 
-Dans ce TP, on utilise la **métrique** DeepEval `FaithfulnessMetric`, qui mesure la fidélité de la réponse vis-à-vis du `retrieval_context`. La fonction `grounding_faithfulness_section()` récupère la réponse **et** le contexte de l'agent, les place dans un `LLMTestCase`, puis lance `evaluate(...)`.
+Dans ce TP, on utilise la métrique DeepEval `FaithfulnessMetric`, qui mesure la fidélité de la réponse vis-à-vis du `retrieval_context`. La fonction `grounding_faithfulness_section()` récupère la réponse **et** le contexte de l'agent, les place dans un `LLMTestCase`, puis lance `evaluate(...)`.
 
 ```mermaid
 sequenceDiagram
@@ -209,17 +209,17 @@ On a modélisé cela dans `get_agent_answer_and_context(question)`, qui appelle 
 > - `Answer Relevancy` = « La réponse répond-elle à la question ? »
 > - `Contextual Relevancy / Precision / Recall` = « A-t-on récupéré le bon contexte, avec le bon niveau de bruit/couverture ? »
 
-### ✅ Tester par soit même
+### ✅ Tester par soi-même
 
 👨‍💻 Un TODO a été ajouté, **complète le code** :
 
 1. `TODO-03` : calibre le seuil de faithfulness en définissant un niveau de risque acceptable. Consulte la doc du score si besoin.
 
-> [!NOTE]
-> Pour exécuter cette section du script, lance :  
-> ```bash
-> uv run python eval/step2_foundations/basic_eval_examples.py --section grounding
-> ```
+Pour exécuter cette section du script, lance :
+
+```bash
+uv run python eval/step2_foundations/basic_eval_examples.py --section grounding
+```
 
 Avec la question posée dans le test ("Comment diagnostiquer un incident VPN ?"), le résultat devrait être très bon, car les infos sur la gestion des VPN est dans la base de connaissance (voir les fiches sous `app/data/knowledge_base`), et les infos sont donc chargées dans le `retrieval_context`.
 
@@ -230,14 +230,18 @@ N'hésite pas à tester d'autres questions en prenant un thème qui n'existe dan
 > Un seuil **trop bas** laisse passer des approximations (hallucinations tolérées). Un seuil **trop haut** peut bloquer des réponses pourtant utiles.
 
 
-## Solution
-
 > [!TIP]
-> Le but de l’étape n’est pas d’obtenir 100% de vert. Le but, c’est de comprendre **pourquoi** un test échoue et **quelle action produit une amélioration mesurable**.
+> Le but de l'étape n'est pas d'obtenir 100% de vert. Le but, c'est de comprendre **pourquoi** un test échoue et **quelle action produit une amélioration mesurable**.
+
+<details>
+<summary>Solution (cliquer pour afficher)</summary>
 
 Si tu veux comparer ton résultat : `eval/solutions/step2/basic_eval_examples_solution.py`
+
+</details>
+
 ---
 
 ## 🚀 Étape suivante
 
-T'as compris les bases ! Passe à l'industrialisation : **[TP 03 - Industrialization](./03-industrialization.md)**
+Tu as compris les bases ! Passe à l'industrialisation : **[TP 03 — Industrialisation](./03-industrialization.md)**

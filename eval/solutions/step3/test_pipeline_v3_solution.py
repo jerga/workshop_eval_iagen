@@ -22,7 +22,7 @@ from eval.solutions.step3.safety_metrics_solution import role_violation_metric
 # =============================================================================
 DATASET_DIR = PROJECT_ROOT / "eval" / "solutions" / "step3" / "datasets"
 
-JUDGE_DATASET_PATH = DATASET_DIR / "judge_goldens.csv"
+JUDGE_DATASET_PATH = DATASET_DIR / "judge_cases.csv"
 JSON_DATASET_PATH = DATASET_DIR / "json_correctness_cases.csv"
 GROUNDING_DATASET_PATH = DATASET_DIR / "grounding_faithfulness_cases.csv"
 TOOLING_DATASET_PATH = DATASET_DIR / "tooling_correctness_cases.csv"

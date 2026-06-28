@@ -1,4 +1,4 @@
-## 🚀 TP 04 - Observabilité & évaluation en ligne
+# 📡 TP 04 — Observabilité & évaluation en ligne
 
 Dans les TP précédents, on a fait de l'évaluation **hors ligne** : on jouait des datasets figés, préparés à l'avance, pour mettre au point ou faire évoluer un cas d'usage. C'est exactement ce qu'on fait quand on développe ou qu'on prépare une mise en production.
 
@@ -66,7 +66,7 @@ Dans ce TP, on part d'une **vraie trace** comme « dataset en ligne », et on lu
 
 ---
 
-## Étape 1 - Découvrir Langfuse
+## Étape 1 — Découvrir Langfuse
 
 ### ✅ Créer un compte et un projet
 
@@ -112,9 +112,9 @@ Prends 2 minutes pour explorer la barre latérale de Langfuse. Les sections clé
 
 ---
 
-## Étape 2 - Instrumentons l'application
+## Étape 2 — Instrumentons l'application
 
-### Objectif
+### 🔎 Objectif
 
 Du **tracing** a déjà été ajouté à l'application pour que chaque exécution remonte dans Langfuse.
 
@@ -213,9 +213,9 @@ Ouvre **Tracing** dans Langfuse et clique sur une trace (icone "span" avec une d
 
 ---
 
-## Étape 3 - Évaluer une trace (en ligne)
+## Étape 3 — Évaluer une trace (en ligne)
 
-### Objectif
+### 🔎 Objectif
 
 Partir d'une **vraie trace** (notre « dataset en ligne »), la récupérer en local, et lui appliquer l'éval **LLM-as-a-Judge** du TP 03.
 
@@ -225,7 +225,7 @@ En évaluation en ligne, on ne part pas d'un dataset préparé à la main : on p
 
 1. **Exporter** les traces depuis Langfuse via le SDK.
 2. **Formater** ces traces dans le format CSV « judge » des TP précédents.
-3. **Évaluer** avec le pipeline Judge (les 2 **métriques** du TP 03).
+3. **Évaluer** avec le pipeline Judge (les 2 métriques du TP 03).
 
 ### ✅ Exporter les traces via le SDK
 
@@ -296,9 +296,9 @@ uv run python eval/step4_production/judge_pipeline.py
 
 ---
 
-## Étape 4 - Remonter un score
+## Étape 4 — Remonter un score
 
-### Objectif
+### 🔎 Objectif
 
 Persister les scores calculés localement avec DeepEval, en s'appuyant sur **la feature "Scores" de Langfuse**, pour les analyser dans le temps.
 
@@ -369,4 +369,8 @@ Quelques suites possibles :
 - **Versionner un Dataset Langfuse** et lancer des [Experiments](https://langfuse.com/docs/evaluation/experiments/experiments-via-sdk) pour comparer des runs côte à côte (retour vers l'évaluation hors ligne, outillée).
 
 ---
+
+## 🎉 Fin du workshop
+
+Retour au sommaire : **[Vue d'ensemble du workshop](./00-overview.md)**
 
