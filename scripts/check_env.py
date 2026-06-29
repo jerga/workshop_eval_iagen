@@ -29,7 +29,7 @@ def _missing(keys: Iterable[str]) -> list[str]:
 
 
 def main() -> int:
-    load_dotenv()
+    load_dotenv(override=True)
 
     missing_app = _missing(REQUIRED_FOR_APP)
 

@@ -43,7 +43,7 @@ def _as_bool(value: str) -> bool:
 
 
 def load_config() -> AppConfig:
-    load_dotenv()
+    load_dotenv(override=True)
 
     llm_provider = _required_env("LLM_PROVIDER")
     embedding_provider = _required_env("EMBEDDING_PROVIDER")

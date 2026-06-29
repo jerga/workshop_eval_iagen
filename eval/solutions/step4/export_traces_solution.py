@@ -14,7 +14,7 @@ OUTPUT_PATH = Path(__file__).resolve().parent / "datasets" / "online_traces.json
 
 
 def build_client() -> Langfuse:
-    load_dotenv()
+    load_dotenv(override=True)
     return Langfuse(
         public_key=os.environ["LANGFUSE_PUBLIC_KEY"],
         secret_key=os.environ["LANGFUSE_SECRET_KEY"],

@@ -29,7 +29,7 @@ def load_rows(path: Path) -> list[dict[str, str]]:
 
 
 def build_langfuse_client() -> Langfuse | None:
-    load_dotenv()
+    load_dotenv(override=True)
     public_key = os.getenv("LANGFUSE_PUBLIC_KEY")
     secret_key = os.getenv("LANGFUSE_SECRET_KEY")
     if not public_key or not secret_key:

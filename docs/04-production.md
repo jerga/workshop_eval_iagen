@@ -71,11 +71,11 @@ Dans ce TP, on part d'une **vraie trace** comme « dataset en ligne », et on lu
 ### ✅ Créer un compte et un projet
 
 1. Rends-toi sur l'instance **Europe** : [cloud.langfuse.com](https://cloud.langfuse.com).
-2. Crée un compte (ou connecte-toi).
+2. Crée un compte via `sign-up` en bas du formulaire (ou connecte-toi).
 
 ### ✅ Générer une API Key
 
-Récupère directement les valeurs des variables sur l'écran qui suit le premier login. Sinon :
+Récupère directement les valeurs des variables sur l'écran qui suit le premier login en cliquant sur `Create new API key`. Sinon :
 
 1. Dans ton projet, va dans **Settings → API Keys**.
 2. Clique sur **Create new API keys**.
@@ -229,14 +229,14 @@ En évaluation en ligne, on ne part pas d'un dataset préparé à la main : on p
 
 ### ✅ Exporter les traces via le SDK
 
-Le script [`export_traces.py`](../eval/step4_production/export_traces.py) liste les **3** dernières traces de l'agent `support-rag-agent` et les enregistre en local (JSON) :
+Le script [`export_traces.py`](../eval/step4_production/export_traces.py) liste les **3** dernières traces de l'agent `support-rag-agent` et les enregistre en local (JSON). Exécute-le directement :
 
 ```bash
 uv run python eval/step4_production/export_traces.py
 ```
 
 <details>
-<summary>Le code (cliquer pour afficher)</summary>
+<summary>Le code (cliquer pour afficher - aucune modification attendue)</summary>
 
 ```python
 client = Langfuse(
@@ -352,7 +352,7 @@ client.create_score(
 Dans le menu **Score**, il y avait aussi un onglet `Analytics` ([doc](https://langfuse.com/docs/evaluation/scores/score-analytics)) : Il permet de visualiser l'évolution des scores **dans le temps**, agrégée par nom de score.
 
 > [!TIP]
-> Modifie le prompt du juge `ToneProfessional` dans `judge_metrics.py` pour le rendre plus permissif et augmenter le score (ex: "Evalue le côté professionnel du ton de la réponse").
+> Modifie le prompt du juge `ToneProfessional` dans `judge_metrics.py` du step 4 pour le rendre plus permissif et augmenter le score (ex: "Evalue le côté professionnel du ton de la réponse").
 >
 > Relance le pipeline :
 > ```bash
