@@ -117,6 +117,12 @@ sequenceDiagram
 > ```
 > Observe l'output du test, les résultats sont structurés et détaillés. Ca facilite l'interprétation (géré par le framework DeepEval).
 
+> [!TIP]
+> Pour voir le contenu réel des échanges (question envoyée, réponse de l'agent, et contexte de retrieval), ajoute l'option `--log-io` :
+> ```bash
+> uv run python eval/step2_foundations/basic_eval_examples.py --section judge --log-io
+> ```
+
 > [!WARNING]
 > Le test **présence intro/conclusion** devrait normalement échouer... Il manque une instruction dans le prompt de l'agent.
 > 
@@ -224,6 +230,16 @@ uv run python eval/step2_foundations/basic_eval_examples.py --section grounding
 Avec la question posée dans le test ("Comment diagnostiquer un incident VPN ?"), le résultat devrait être très bon, car les infos sur la gestion des VPN est dans la base de connaissance (voir les fiches sous `app/data/knowledge_base`), et les infos sont donc chargées dans le `retrieval_context`.
 
 N'hésite pas à tester d'autres questions en prenant un thème qui n'existe dans les fiches (ex: `AWS`, `Claude Code`, ...).
+
+
+> [!NOTE]
+> **Pourquoi une question totalement hors sujet peut quand même donner un score de 1 ?**
+>
+> Si tu poses une question sans rapport (ex: "Comment cuire des pâtes ?"), l'agent va répondre qu'il ne peut pas t'aider. Et pourtant la faithfulness affiche **1** (bon score). C'est normal :
+>
+> La faithfulness ne vérifie **pas** si la réponse est pertinente, mais seulement si chaque **affirmation** de la réponse est **soutenue par le `retrieval_context`** (anti-hallucination). Un message du type "Je ne peux pas répondre" ne contient **aucune affirmation factuelle** à contredire → 0 hallucination → score de 1.
+>
+> Pour détecter ce cas, il faut combiner d'**autres métriques** : `Answer Relevancy` (la réponse répond-elle à la question ?) ou `Contextual Relevancy` (le contexte récupéré est-il pertinent ?).
 
 
 > [!WARNING]

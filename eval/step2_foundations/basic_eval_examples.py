@@ -31,13 +31,28 @@ def get_agent_answer_and_context(question: str) -> tuple[str, list[str]]:
     return result.answer, [item.document.content for item in result.retrieved_documents]
 
 
-def llm_judge_section() -> list[bool]:
+def log_io(question: str, answer: str, retrieval_context: list[str] | None = None) -> None:
+    """Affiche l'input et l'output de l'agent pour faciliter le debug."""
+    print("\n--- INPUT / OUTPUT ---")
+    print(f"[INPUT]  {question}")
+    print(f"[OUTPUT] {answer}")
+    if retrieval_context is not None:
+        print("[CONTEXT]")
+        for idx, chunk in enumerate(retrieval_context, start=1):
+            print(f"  ({idx}) {chunk}")
+    print("--- END INPUT / OUTPUT ---")
+
+
+def llm_judge_section(verbose: bool = False) -> list[bool]:
     print("\n=== SECTION LLM-AS-A-JUDGE ===")
     model = build_deepeval_model()
 
     question = "Le VPN est indisponible, que dois-je faire ?"
 
     answer, _ = get_agent_answer_and_context(question)
+
+    if verbose:
+        log_io(question, answer)
 
     # TODO-01: rendre le prompt du juge plus précis pour qu'il évalue les instructions importantes du prompt système de l'agent
     tone_score = GEval(
@@ -70,7 +85,7 @@ def llm_judge_section() -> list[bool]:
     return [tone_ok, formula_ok]
 
 
-def grounding_faithfulness_section() -> list[bool]:
+def grounding_faithfulness_section(verbose: bool = False) -> list[bool]:
     print("\n=== SECTION GROUNDING / FAITHFULNESS ===")
     model = build_deepeval_model()
 
@@ -78,9 +93,12 @@ def grounding_faithfulness_section() -> list[bool]:
 
     answer, retrieval_context = get_agent_answer_and_context(question)
 
+    if verbose:
+        log_io(question, answer, retrieval_context)
+
     # TODO-03: ajuster le seuil de faithfulness selon votre tolerance au risque d'hallucination.
     # threshold = seuil de réussite : le cas passe si le score >= threshold.
-    faithfulness_score = FaithfulnessMetric(threshold=0, model=model)
+    faithfulness_score = FaithfulnessMetric(threshold=0.5, model=model)
 
     case = LLMTestCase(input=question, actual_output=answer, retrieval_context=retrieval_context)
     result = evaluate(test_cases=[case], metrics=[faithfulness_score], display_config=DisplayConfig(print_results=True))
@@ -96,6 +114,11 @@ def parse_args() -> argparse.Namespace:
         default="all",
         help="Execute une seule section ou tout le script.",
     )
+    parser.add_argument(
+        "--log-io",
+        action="store_true",
+        help="Affiche l'input et l'output de l'agent pour chaque cas de test.",
+    )
     return parser.parse_args()
 
 
@@ -104,9 +127,9 @@ def main() -> int:
 
     results: list[bool] = []
     if args.section in {"all", "judge"}:
-        results.extend(llm_judge_section())
+        results.extend(llm_judge_section(verbose=args.log_io))
     if args.section in {"all", "grounding"}:
-        results.extend(grounding_faithfulness_section())
+        results.extend(grounding_faithfulness_section(verbose=args.log_io))
 
     passed = sum(1 for item in results if item)
     total = len(results)

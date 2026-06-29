@@ -1,6 +1,5 @@
 """Step 3 - Métriques LLM-as-a-Judge pour évaluation pytest.
 """
-from __future__ import annotations
 
 from eval.common.deepeval_model import build_deepeval_model
 from deepeval.metrics import GEval

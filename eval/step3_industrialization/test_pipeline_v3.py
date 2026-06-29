@@ -18,6 +18,10 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from eval.step3_industrialization.metrics.judge_metrics import (correctness_metric, tone_metric)
+from eval.step3_industrialization.metrics.deterministic_metrics import json_correctness_metric
+from eval.step3_industrialization.metrics.grounding_metrics import faithfulness_metric
+from eval.step3_industrialization.metrics.tooling_metrics import tool_correctness_metric
+from eval.step3_industrialization.metrics.safety_metrics import role_violation_metric
 
 # =============================================================================
 # Chargement des datasets

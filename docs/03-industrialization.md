@@ -106,7 +106,7 @@ correctness_score = GEval(
 > `pytest` + `assert_test` + commande `deepeval test run` s'intègre naturellement à une logique de pipeline de tests.
 > Le dataset est chargé à travers l'annotation `pytest`. 
 >  
-> `pytest` + `assert_test` est plus adapté à une vérification de gate de non-régression en CI/CD.
+> Cette technique est donc plus adaptée à une vérification de gate de non-régression en CI/CD.
 
 
 Exécute le pipeline, découvre le reporting proposé, et analyse les résultats :
@@ -432,17 +432,15 @@ Objectif : vérifier que les outils attendus sont bien appelés par l'agent, ave
 # metrics/tooling_metrics.py
 from deepeval.metrics import ToolCorrectnessMetric
 from deepeval.test_case import ToolCallParams
-from eval.common.deepeval_model import build_deepeval_model
 
 
 def tool_correctness_metric(threshold: float, should_exact_match: bool, should_consider_ordering: bool) -> ToolCorrectnessMetric:
     model = build_deepeval_model()
     return ToolCorrectnessMetric(
-        model=model,
         threshold=threshold,
         should_exact_match=should_exact_match,
         should_consider_ordering=should_consider_ordering,
-        evaluation_params=[ToolCallParams.NAME, ToolCallParams.INPUT_PARAMETERS],
+        evaluation_params=[ToolCallParams.INPUT_PARAMETERS],
         async_mode=False,
     )
 ```
@@ -453,7 +451,7 @@ TOOL_CORRECTNESS_THRESHOLD = 0.8
 
 @pytest.mark.parametrize("test_case", load_tooling_dataset().test_cases)
 def test_tool_correctness_metric(test_case):
-    assert_test(test_case, [tool_metric = tool_correctness_metric(threshold=TOOL_CORRECTNESS_THRESHOLD, should_exact_match=True, should_consider_ordering=False)])
+    assert_test(test_case, [tool_correctness_metric(threshold=TOOL_CORRECTNESS_THRESHOLD, should_exact_match=True, should_consider_ordering=False)])
 ```
 
 </details>

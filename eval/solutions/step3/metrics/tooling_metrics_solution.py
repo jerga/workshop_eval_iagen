@@ -14,6 +14,6 @@ def tool_correctness_metric(
         threshold=threshold,
         should_exact_match=should_exact_match,
         should_consider_ordering=should_consider_ordering,
-        evaluation_params=[ToolCallParams.NAME, ToolCallParams.INPUT_PARAMETERS],
+        evaluation_params=[ToolCallParams.INPUT_PARAMETERS],
         async_mode=False,
     )

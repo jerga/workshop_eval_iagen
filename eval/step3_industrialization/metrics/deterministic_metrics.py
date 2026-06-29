@@ -1,6 +1,5 @@
 """Step 3 - Métrique déterministe (Json correctness).
 """
-from __future__ import annotations
 
 from pydantic import BaseModel
 from eval.common.deepeval_model import build_deepeval_model
