@@ -1,24 +1,14 @@
 """Step 3 - Métriques LLM-as-a-Judge pour évaluation pytest.
-
-Expose les fixtures pytest `correctness_metric` et `tone_metric` qui 
-retournent des instances de métriques GEval. Ces fixtures sont réutilisables
-par les tests paramétrés et scope="module" pour optimiser la performance.
 """
 from __future__ import annotations
-
-import pytest
 
 from eval.common.deepeval_model import build_deepeval_model
 from deepeval.metrics import GEval
 from deepeval.test_case import SingleTurnParams
 
 
-@pytest.fixture(scope="module")
-def correctness_metric() -> GEval:
-    """ Métrique GEval pour évaluer la correction et l'opérationnalité de la réponse IT.
-        Fixture scope="module" : la métrique est construite une seule fois et réutilisée
-        par tous les tests du module.
-    """
+def correctness_metric(threshold: float) -> GEval:
+    """Métrique GEval pour évaluer la correction et l'opérationnalité de la réponse IT."""
     model = build_deepeval_model()
 
     return GEval(
@@ -29,13 +19,12 @@ def correctness_metric() -> GEval:
         ),
         evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
         model=model,
-        threshold=0.5,
+        threshold=threshold,
     )
 
 
-@pytest.fixture(scope="module")
-def tone_metric() -> GEval:
-    """ Fixture pour la métrique de ton professionnel."""
+def tone_metric(threshold: float) -> GEval:
+    """Métrique GEval pour évaluer le ton professionnel."""
     model = build_deepeval_model()
     return GEval(
         name="ToneProfessional",
@@ -48,5 +37,6 @@ def tone_metric() -> GEval:
             "si utile."
         ),
         evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
-        threshold=0.5,
+        model=model,
+        threshold=threshold,
     )

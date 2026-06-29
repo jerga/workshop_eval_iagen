@@ -10,7 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from eval.step3_industrialization.judge_metrics import (correctness_metric)
+from eval.step3_industrialization.metrics.judge_metrics import correctness_metric
 from deepeval.dataset import EvaluationDataset
 from deepeval import assert_test
 
@@ -28,8 +28,11 @@ def load_judge_dataset() -> EvaluationDataset:
     return dataset
 
 
+CORRECTNESS_THRESHOLD = 0.5
+
+
 @pytest.mark.parametrize("test_case", load_judge_dataset().test_cases)
-def test_llm_judge_correctness(test_case, correctness_metric):
+def test_llm_judge_correctness(test_case):
     """Test LLM-as-a-Judge pour la correction et opérationnalité (Support IT)."""
-    assert_test(test_case, [correctness_metric])
+    assert_test(test_case, [correctness_metric(threshold=CORRECTNESS_THRESHOLD)])
 

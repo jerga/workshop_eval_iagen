@@ -1,19 +1,16 @@
 """Solution Step 3 - Métriques paramétrisées pour le TP3.
 
-Fixtures pytest paramétrées qui acceptent un seuil (threshold)
+Fonctions paramétrées qui acceptent un seuil (threshold)
 configurable pour adapter l'évaluation des métriques GEval
 selon les besoins du test.
 """
 from __future__ import annotations
-
-import pytest
 
 from eval.common.deepeval_model import build_deepeval_model
 from deepeval.metrics import GEval
 from deepeval.test_case import SingleTurnParams
 
 
-@pytest.fixture(scope="module")
 def correctness_metric(threshold: float) -> GEval:
     """Métrique GEval pour évaluer la correction et l'opérationnalité de la réponse IT."""
     model = build_deepeval_model()
@@ -30,7 +27,6 @@ def correctness_metric(threshold: float) -> GEval:
     )
 
 
-@pytest.fixture(scope="module")
 def tone_metric(threshold: float) -> GEval:
     """Métrique GEval pour évaluer le ton professionnel et courtois."""
     model = build_deepeval_model()

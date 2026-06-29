@@ -5,11 +5,11 @@ import sys
 
 import pytest
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from eval.solutions.step3.judge_metrics_solution import (
+from eval.solutions.step3.metrics.judge_metrics_solution import (
     correctness_metric,
     tone_metric,
 )
@@ -34,13 +34,13 @@ def load_judge_dataset() -> EvaluationDataset:
 CORRECTNESS_THRESHOLD = 0.5
 
 @pytest.mark.parametrize("test_case", load_judge_dataset().test_cases)
-def test_llm_judge_correctness(test_case, correctness_metric):
+def test_llm_judge_correctness(test_case):
     """Test LLM-as-a-Judge pour la correction et operationnalite (Support IT)."""
     assert_test(test_case, [correctness_metric(threshold=CORRECTNESS_THRESHOLD)])
 
 TONE_THRESHOLD = 0.5
 
 @pytest.mark.parametrize("test_case", load_judge_dataset().test_cases)
-def test_llm_judge_tone(test_case, tone_metric):
+def test_llm_judge_tone(test_case):
     """Test LLM-as-a-Judge pour le ton professionnel."""
     assert_test(test_case, [tone_metric(threshold=TONE_THRESHOLD)])
