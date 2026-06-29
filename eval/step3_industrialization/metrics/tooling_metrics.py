@@ -1,7 +1,7 @@
 """Step 3 - Métrique outillage (Tool correctness).
 """
 from __future__ import annotations
-
+from eval.common.deepeval_model import build_deepeval_model
 from deepeval.metrics import ToolCorrectnessMetric
 from deepeval.test_case import ToolCallParams
 

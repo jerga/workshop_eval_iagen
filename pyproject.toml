@@ -8,6 +8,7 @@ dependencies = [
   "deepeval>=2.0.0",
   "langfuse>=3.0.0",
   "openai>=1.40.0",
+  "pandas>=3.0.4",
   "pydantic>=2.8.2",
   "python-dotenv>=1.0.1",
 ]

@@ -84,6 +84,24 @@ dataset.add_test_cases_from_csv_file(
 	- l'assertion `assert_test`
 3. Complète le TODO du `threshold` dans `GEval` : ajoute un `threshold` pertinent à cette métrique de type LLM-as-a-Judge (voir TP précédent si besoin).
 
+<details>
+<summary>Solution (cliquer pour afficher)</summary>
+
+```python
+correctness_score = GEval(
+    name="CorrectnessSupportIT",
+    criteria=(
+        "Vérifie que la réponse est correcte et opérationnelle pour un contexte "
+        "de support IT, avec des actions utiles et sans contradiction."
+    ),
+    evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
+    model=model,
+    threshold=0.5,
+)
+```
+
+</details>
+
 > [!NOTE]
 > `pytest` + `assert_test` + commande `deepeval test run` s'intègre naturellement à une logique de pipeline de tests.
 > Le dataset est chargé à travers l'annotation `pytest`. 
@@ -118,7 +136,7 @@ python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipelin
 
 Dans cette étape, tu rends le pipeline plus modulaire et les types de tests plus réutilisables. Le fichier de travail est `test_pipeline_v2.py`.
 
-### ✅ Analyser le refactoring
+### ✅ Analyser le refactoring (rien à ajouter)
 
 Objectif : rendre la métrique `correctness` générique et laisser la configuration du niveau d'exigence dans le pipeline (`threshold`).
 
@@ -130,7 +148,7 @@ Objectif : rendre la métrique `correctness` générique et laisser la configura
 > Le service de métrique doit rester générique : il expose une construction configurable, et le pipeline décide du niveau d'exigence (`threshold`).
 
 <details>
-<summary>Solution (cliquer pour afficher)</summary>
+<summary>Solution déjà implémentée (cliquer pour afficher)</summary>
 
 ```python
 # Côté définition de métrique (metrics/judge_metrics.py)
@@ -287,6 +305,7 @@ Tu n'es bien sûr pas obligé d'utiliser DeepEval pour ce type de contrôle (une
 # metrics/deterministic_metrics.py
 from pydantic import BaseModel
 from deepeval.metrics import JsonCorrectnessMetric
+from eval.common.deepeval_model import build_deepeval_model
 
 
 class ITActionPlan(BaseModel):
@@ -296,7 +315,9 @@ class ITActionPlan(BaseModel):
 
 
 def json_correctness_metric(threshold: float) -> JsonCorrectnessMetric:
+    model = build_deepeval_model()
     return JsonCorrectnessMetric(
+        model=model,
         expected_schema=ITActionPlan,
         threshold=threshold,
         strict_mode=True,
@@ -307,11 +328,10 @@ def json_correctness_metric(threshold: float) -> JsonCorrectnessMetric:
 ```python
 # test_pipeline_v3.py
 JSON_THRESHOLD = 1.0
-json_metric = json_correctness_metric(threshold=JSON_THRESHOLD)
 
 @pytest.mark.parametrize("test_case", load_json_dataset().test_cases)
 def test_json_correctness_metric(test_case):
-    assert_test(test_case, [json_metric])
+    assert_test(test_case, [json_correctness_metric(threshold=JSON_THRESHOLD)])
 ```
 
 </details>
@@ -367,14 +387,10 @@ def faithfulness_metric(threshold: float, truths_extraction_limit: int) -> Faith
 ```python
 # test_pipeline_v3.py
 FAITHFULNESS_THRESHOLD = 0.6
-faithfulness = faithfulness_metric(
-    threshold=FAITHFULNESS_THRESHOLD,
-    truths_extraction_limit=4,
-)
 
 @pytest.mark.parametrize("test_case", load_grounding_dataset().test_cases)
 def test_faithfulness_metric(test_case):
-    assert_test(test_case, [faithfulness])
+    assert_test(test_case, [faithfulness_metric(threshold=FAITHFULNESS_THRESHOLD, truths_extraction_limit=4)])
 ```
 
 </details>
@@ -416,10 +432,13 @@ Objectif : vérifier que les outils attendus sont bien appelés par l'agent, ave
 # metrics/tooling_metrics.py
 from deepeval.metrics import ToolCorrectnessMetric
 from deepeval.test_case import ToolCallParams
+from eval.common.deepeval_model import build_deepeval_model
 
 
 def tool_correctness_metric(threshold: float, should_exact_match: bool, should_consider_ordering: bool) -> ToolCorrectnessMetric:
+    model = build_deepeval_model()
     return ToolCorrectnessMetric(
+        model=model,
         threshold=threshold,
         should_exact_match=should_exact_match,
         should_consider_ordering=should_consider_ordering,
@@ -431,15 +450,10 @@ def tool_correctness_metric(threshold: float, should_exact_match: bool, should_c
 ```python
 # test_pipeline_v3.py
 TOOL_CORRECTNESS_THRESHOLD = 0.8
-tool_metric = tool_correctness_metric(
-    threshold=TOOL_CORRECTNESS_THRESHOLD,
-    should_exact_match=True,
-    should_consider_ordering=False,
-)
 
 @pytest.mark.parametrize("test_case", load_tooling_dataset().test_cases)
 def test_tool_correctness_metric(test_case):
-    assert_test(test_case, [tool_metric])
+    assert_test(test_case, [tool_metric = tool_correctness_metric(threshold=TOOL_CORRECTNESS_THRESHOLD, should_exact_match=True, should_consider_ordering=False)])
 ```
 
 </details>
@@ -492,14 +506,10 @@ EXPECTED_ROLE = (
     "Agent helpdesk IT interne: professionnel, securise, centré support utilisateur, "
     "et sans divulgation d'informations sensibles."
 )
-safety_metric = role_violation_metric(
-    threshold=ROLE_VIOLATION_THRESHOLD,
-    role=EXPECTED_ROLE,
-)
 
 @pytest.mark.parametrize("test_case", load_safety_dataset().test_cases)
 def test_role_violation_metric(test_case):
-    assert_test(test_case, [safety_metric])
+    assert_test(test_case, [role_violation_metric(threshold=ROLE_VIOLATION_THRESHOLD, role=EXPECTED_ROLE)])
 ```
 
 </details>
