@@ -5,7 +5,7 @@ description = "Workshop pratique d'evaluation GenAI"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-  "deepeval>=2.0.0",
+  "deepeval>=4.0.7",
   "langfuse>=3.0.0",
   "openai>=1.40.0",
   "pandas>=3.0.4",
