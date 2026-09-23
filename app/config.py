@@ -27,6 +27,10 @@ class AppConfig:
         return self.app_dir / "data" / "knowledge_base"
 
     @property
+    def embedding_cache_file(self) -> Path:
+        return Path(os.getenv("EMBEDDING_CACHE_FILE", str(self.app_dir / "data" / "embeddings_cache.sqlite3")))
+
+    @property
     def service_status_file(self) -> Path:
         return self.app_dir / "data" / "service_status.json"
 

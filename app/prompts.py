@@ -25,6 +25,8 @@ def build_user_prompt(
     docs_text = "\n\n".join(
         f"[{item.document.doc_id}] {item.document.content[:1200]}" for item in retrieved_documents
     )
+    if not docs_text:
+        docs_text = "Aucun document pertinent trouvé."
 
     tools_text = "\n".join(
         f"- {call.tool_name}({call.arguments}) => {call.result}" for call in tool_calls
