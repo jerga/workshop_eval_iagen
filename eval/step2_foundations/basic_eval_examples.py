@@ -89,16 +89,19 @@ def grounding_faithfulness_section(verbose: bool = False) -> list[bool]:
     print("\n=== SECTION GROUNDING / FAITHFULNESS ===")
     model = build_deepeval_model()
 
-    question = "Comment diagnostiquer un incident VPN ?"
-
+    question = "Que faire en cas de problème de VPN ?"
+    # Variante à tester : "Que faire si la connexion VPN échoue ?"
+    
     answer, retrieval_context = get_agent_answer_and_context(question)
 
+    if not retrieval_context:
+        raise ValueError("Faithfulness nécessite un contexte documentaire récupéré par l'agent.")
     if verbose:
         log_io(question, answer, retrieval_context)
 
     # TODO-03: ajuster le seuil de faithfulness selon votre tolerance au risque d'hallucination.
     # threshold = seuil de réussite : le cas passe si le score >= threshold.
-    faithfulness_score = FaithfulnessMetric(threshold=0.5, model=model)
+    faithfulness_score = FaithfulnessMetric(threshold=0.5, model=model, penalize_ambiguous_claims=True)
 
     case = LLMTestCase(input=question, actual_output=answer, retrieval_context=retrieval_context)
     result = evaluate(test_cases=[case], metrics=[faithfulness_score], display_config=DisplayConfig(print_results=True))

@@ -5,7 +5,7 @@ import re
 from langfuse import get_client, observe
 
 from app.config import load_config
-from app.embeddings import OpenAICompatibleEmbeddings
+from app.embeddings import DocumentEmbeddingCache, OpenAICompatibleEmbeddings
 from app.llm import OpenAICompatibleLLM
 from app.models import AgentResult, ToolCall
 from app.prompts import SYSTEM_PROMPT, build_user_prompt
@@ -17,7 +17,8 @@ class SupportRAGAgent:
     def __init__(self) -> None:
         self.config = load_config()
         self.embeddings = OpenAICompatibleEmbeddings(self.config)
-        self.retriever = SimpleRetriever(self.config.knowledge_base_dir, embeddings=self.embeddings)
+        cache = DocumentEmbeddingCache(self.config.embedding_cache_file, self.config)
+        self.retriever = SimpleRetriever(self.config.knowledge_base_dir, embeddings=self.embeddings, cache=cache)
         self.llm = OpenAICompatibleLLM(self.config)
 
     @staticmethod

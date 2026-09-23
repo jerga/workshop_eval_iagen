@@ -29,4 +29,6 @@ results/
 Thumbs.db
 
 # Data
+/app/data/embeddings_cache.sqlite3*
 eval/step4_production/datasets/
+eval/solutions/step4/datasets/

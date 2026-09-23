@@ -22,7 +22,7 @@ Sur un vrai projet GenAI, la démarche d'évaluation suit un fil logique :
 
 Pour notre cas d'usage — un **agent RAG de support IT** — deux familles de tests sont prioritaires :
 
-- **LLM-as-a-Judge** : un LLM joue le rôle de relecteur qualité pour des critères qui ne s'expriment pas par une règle simple. Indispensable car ces exigences sont subjectives et dépendent du contexte métier.
+- **LLM-as-a-Judge** custom : un LLM joue le rôle de relecteur qualité pour des critères qui ne s'expriment pas par une règle simple. Indispensable car ces exigences sont subjectives et dépendent du contexte métier.
 - **Grounding** : on vérifie que la réponse reste **fidèle au contexte récupéré**, sans inventer. C'est central sur un RAG, où le risque principal est l'hallucination malgré une réponse bien rédigée.
 
 ### 🔎 Pourquoi un framework d'évaluation ?
@@ -160,6 +160,10 @@ Le **Grounding** répond à une question simple : « **la réponse reste-t-elle 
 
 C'est **important sur un cas d'usage RAG** : le risque principal n'est pas une réponse mal écrite, mais une réponse fluide et convaincante qui **ajoute des informations absentes du contexte** (hallucination).
 
+> [!NOTE]
+> La plupart des techniques de grounding reposent sur des **LLM as a Judge** : un modèle juge si les affirmations de la réponse sont étayées par le contexte récupéré. Le score reste une estimation sémantique, pas une preuve formelle.
+
+
 Dans ce TP, on utilise la métrique DeepEval `FaithfulnessMetric`, qui mesure la fidélité de la réponse vis-à-vis du `retrieval_context`. La fonction `grounding_faithfulness_section()` récupère la réponse **et** le contexte de l'agent, les place dans un `LLMTestCase`, puis lance `evaluate(...)`.
 
 ```mermaid
@@ -229,13 +233,13 @@ uv run python eval/step2_foundations/basic_eval_examples.py --section grounding
 
 Avec la question posée dans le test ("Comment diagnostiquer un incident VPN ?"), le résultat devrait être très bon, car les infos sur la gestion des VPN est dans la base de connaissance (voir les fiches sous `app/data/knowledge_base`), et les infos sont donc chargées dans le `retrieval_context`.
 
-N'hésite pas à tester d'autres questions en prenant un thème qui n'existe dans les fiches (ex: `AWS`, `Claude Code`, ...).
+N'hésite pas à tester d'autres variantes de la question en intégrant des éléments non présents dans les fiches.
 
 
 > [!NOTE]
 > **Pourquoi une question totalement hors sujet peut quand même donner un score de 1 ?**
 >
-> Si tu poses une question sans rapport (ex: "Comment cuire des pâtes ?"), l'agent va répondre qu'il ne peut pas t'aider. Et pourtant la faithfulness affiche **1** (bon score). C'est normal :
+> Si tu poses une question sans rapport (ex: "Comment cuire des pâtes ?"), l'agent va répondre qu'il ne peut pas t'aider. Et pourtant la faithfulness peut afficher **1** (bon score). C'est normal :
 >
 > La faithfulness ne vérifie **pas** si la réponse est pertinente, mais seulement si chaque **affirmation** de la réponse est **soutenue par le `retrieval_context`** (anti-hallucination). Un message du type "Je ne peux pas répondre" ne contient **aucune affirmation factuelle** à contredire → 0 hallucination → score de 1.
 >
