@@ -21,6 +21,9 @@ Pour cela, on s'appuie sur **Langfuse**.
 >
 > Doc officielle : [Observability](https://langfuse.com/docs/observability/overview) · [Evaluation](https://langfuse.com/docs/evaluation/overview)
 
+> [!NOTE]
+> Ce TP cible **Langfuse v4** et son modèle de données **« observations-first »** ([présentation v4](https://langfuse.com/docs/v4)) : tout est **observation** (span, génération, embedding...) ; une **trace** est simplement l'ensemble des observations qui partagent un même `trace_id` ;
+
 > [!IMPORTANT]
 > Ce TP est **autonome** : il peut se lancer indépendamment des TP 01 à 03.
 
@@ -106,7 +109,7 @@ Prends 2 minutes pour explorer la barre latérale de Langfuse. Les sections clé
 | Section | À quoi ça sert |
 | --- | --- |
 | **Home** | Vue d'ensemble (volume, coûts, latence, scores) |
-| **Observability → Tracing** | Liste des traces (une exécution end-to-end de ton app) |
+| **Observability → Tracing** | Table des **observations** (une ligne = une étape). Par défaut filtrée sur `Is Root Observation = true` → une ligne par exécution de ton app |
 | **Evaluation → Scores** | Tous les scores rattachés aux traces (c'est notre cible !) |
 | **Evaluation → Datasets** | Jeux de cas de test versionnés, pour les Experiments (offline) |
 
@@ -124,17 +127,22 @@ Le tracing était inactif tant que les variables d'env n'étaient pas définies 
 
 Une bonne trace de base doit avoir :
 
-- un **nom descriptif** (`support-rag-agent`, pas `agent-1`) ;
+- un **nom descriptif** et stable (`support-rag-agent`, pas `agent-1`) ;
 - le **modèle** et l'**usage de tokens** (capturés automatiquement par l'intégration) ;
-- une **hiérarchie de spans** quand il y a plusieurs étapes ;
-- des **entrées/sorties lisibles** (la question et la réponse, pas tous les arguments internes).
+- une **hiérarchie d'observations** quand il y a plusieurs étapes ;
+- des **entrées/sorties lisibles sur l'observation racine** (la question et la réponse, pas tous les arguments internes) : c'est elle qui fournit l'input/output de la trace ;
+- des **attributs de corrélation propagés** à toutes les observations (nom de trace, et selon les besoins `user_id`, `session_id`, `tags`...) pour pouvoir filtrer et agréger.
+
+> [!TIP]
+> Référence Langfuse : [What does a good trace look like?](https://langfuse.com/docs/observability/best-practices)
 
 ### 👨‍💻 Ce qu'on a instrumenté dans `app`
 
 1. **Intégration native OpenAI** : Chaque appel LLM est tracé automatiquement (modèle + tokens) avec le drop-in `langfuse.openai` (sorte de wrapper autour de la lib openai).
-2. **Décorateur `@observe`** sur la méthode `answer()` de l'agent : ça crée la **trace racine** nommée `support-rag-agent`.
-3. **Entrées/sorties de trace** explicites (question → réponse) pour une lecture claire dans l'UI.
-4. **`flush()`** en fin de programme : indispensable dans un script court, sinon les traces ne partent jamais.
+2. **Décorateur `@observe`** sur la méthode `answer()` de l'agent : ça crée l'**observation racine** nommée `support-rag-agent`. La capture automatique des arguments est désactivée (`capture_input=False`, `capture_output=False`) pour ne pas remonter l'objet agent ni tout le `AgentResult`.
+3. **Entrées/sorties explicites sur l'observation racine** (question → réponse) via `update_current_span()` : c'est ce que l'UI et les évaluateurs affichent comme input/output de la trace.
+4. **`propagate_attributes(trace_name=...)`** autour des étapes internes : le nom de trace est porté par **chaque** observation (génération, embeddings), ce qui permet de filtrer dessus.
+5. **`flush()`** en fin de programme : indispensable dans un script court, sinon les traces ne partent jamais.
 
 <details>
 <summary>Voir les modifications (cliquer pour afficher)</summary>
@@ -148,17 +156,22 @@ from openai import OpenAI
 from langfuse.openai import OpenAI
 ```
 
-`app/rag_agent.py` — décorateur + IO de trace :
+`app/rag_agent.py` — décorateur + IO de l'observation racine + propagation :
 
 ```python
-from langfuse import get_client, observe
+from langfuse import get_client, observe, propagate_attributes
 
-@observe(name="support-rag-agent")
+TRACE_NAME = "support-rag-agent"
+
+@observe(name=TRACE_NAME, capture_input=False, capture_output=False)
 def answer(self, question: str) -> AgentResult:
-    ...
     client = get_client()
-    client.set_current_trace_io(input=question, output=final_answer)
-    client.update_current_span(metadata=metadata)
+    client.update_current_span(input=question)
+
+    with propagate_attributes(trace_name=TRACE_NAME):
+        ...  # retrieval, outil, appel LLM
+
+    client.update_current_span(output=final_answer, metadata=metadata)
     return AgentResult(...)
 ```
 
@@ -167,12 +180,9 @@ def answer(self, question: str) -> AgentResult:
 ```python
 def _setup_langfuse() -> None:
     load_dotenv()
+    # Le SDK lit nativement LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY / LANGFUSE_BASE_URL.
     has_keys = bool(os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"))
-    if has_keys:
-        base_url = os.getenv("LANGFUSE_BASE_URL")
-        if base_url and not os.getenv("LANGFUSE_HOST"):
-            os.environ["LANGFUSE_HOST"] = base_url
-    else:
+    if not has_keys:
         # Pas de compte / clés : tracing désactivé proprement, aucun bruit.
         os.environ.setdefault("LANGFUSE_TRACING_ENABLED", "false")
         logging.getLogger("langfuse").setLevel(logging.ERROR)
@@ -195,14 +205,14 @@ uv run python -m app.cli "Comment activer le MFA sur mon compte ?"
 
 ### ✅ Analyser les traces dans l'UI
 
-Ouvre **Tracing** dans Langfuse et clique sur une trace (icone "span" avec une double flèche bleue ↔️, il doit y en avoir 3 de ce type). Observe en particulier :
+Ouvre **Tracing** dans Langfuse. C'est une table d'**observations**, filtrée par défaut sur `Is Root Observation = true` : tu dois voir **3 lignes** `support-rag-agent` (une par exécution). Clique sur l'une d'elles pour ouvrir la vue trace et observe en particulier :
 
-- l'**input** (la question, dans le 1er bloc) et l'**output** (la réponse, dans le bloc qui suit) ;
+- l'**input** (la question, dans le 1er bloc) et l'**output** (la réponse, dans le bloc qui suit) de l'observation racine ;
 - la **génération** imbriquée, dans l'arbre de gauche (l'appel LLM, nommé `OpenAI-generation` avec l'icone rose) avec les infos techniques (latence, modèle, tokens, ...) ;
 - le `trace_id` (tout en haut, après  `support-rag-agent:`) — on en aura besoin juste après.
 
 > [!TIP]
-> Garde en tête la notion de **trace** = une exécution complète, et d'**observation** (span / génération) = une étape à l'intérieur. C'est sur la **trace** qu'on va rattacher notre score d'évaluation.
+> Garde en tête la notion d'**observation** (span / génération / embedding) = une étape, et de **trace** = l'ensemble des observations d'une même exécution (même `trace_id`). C'est sur la **trace** (via son `trace_id`) qu'on va rattacher notre score d'évaluation.
 
 > [!NOTE]
 > Tu as forcément repéré les 7 spans imbriqués `OpenAI-embedding` (icone orange).
@@ -229,7 +239,7 @@ En évaluation en ligne, on ne part pas d'un dataset préparé à la main : on p
 
 ### ✅ Exporter les traces via le SDK
 
-Le script [`export_traces.py`](../eval/step4_production/export_traces.py) liste les **3** dernières traces de l'agent `support-rag-agent` et les enregistre en local (JSON). Exécute-le directement :
+Le script [`export_traces.py`](../eval/step4_production/export_traces.py) récupère les **3** dernières exécutions de l'agent `support-rag-agent` et les enregistre en local (JSON). Exécute-le directement :
 
 ```bash
 uv run python eval/step4_production/export_traces.py
@@ -242,12 +252,21 @@ uv run python eval/step4_production/export_traces.py
 client = Langfuse(
     public_key=os.environ["LANGFUSE_PUBLIC_KEY"],
     secret_key=os.environ["LANGFUSE_SECRET_KEY"],
-    host=os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com"),
+    base_url=os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com"),
 )
-response = client.api.trace.list(name="support-rag-agent", limit=3)
+now = datetime.now(timezone.utc)
+response = client.api.observations.get_many(
+    name="support-rag-agent",       # nom de l'observation racine
+    fields="core,basic,io",         # groupes de champs : ids, nom, input/output
+    from_start_time=now - timedelta(days=7),
+    to_start_time=now,
+    limit=3,
+)
 traces = [
-    {"trace_id": item.id, "input": item.input, "output": item.output}
+    {"trace_id": item.trace_id, "timestamp": str(item.start_time),
+     "input": item.input, "output": item.output}
     for item in response.data
+    if item.parent_observation_id is None  # observation racine = la trace
 ]
 ```
 
@@ -347,7 +366,7 @@ client.create_score(
 ### ✅ Visualiser les résultats dans Langfuse
 
 - Navigue dans **Evaluation → Scores** : tu vois apparaître une liste de traces, et les noms de score dans la colonne `name` : `CorrectnessSupportIT` et `ToneProfessional`, avec leur valeur et leur commentaire (scroller horizontalement si besoin).
-- Clique sur une ligne pour ouvrir une trace évaluée → on retourne dans le menu Tracing, et on voit en haut à gauche les scores affichés directement dessus + une info-bulle avec le commentaire (au survol).
+- Clique sur une ligne pour ouvrir une trace évaluée → on retourne dans la vue trace, et on voit en haut à gauche les scores affichés directement dessus + une info-bulle avec le commentaire (au survol).
 
 Dans le menu **Score**, il y avait aussi un onglet `Analytics` ([doc](https://langfuse.com/docs/evaluation/scores/score-analytics)) : Il permet de visualiser l'évolution des scores **dans le temps**, agrégée par nom de score.
 
@@ -365,7 +384,7 @@ Dans le menu **Score**, il y avait aussi un onglet `Analytics` ([doc](https://la
 Quelques suites possibles :
 
 - **Enrichir un dataset hors ligne avec une trace, et relancer un run sur le dataset enrichi** : ajouter de nouvelles traces de prod exportées, puis réévaluer.
-- **Automatiser l'éval en ligne** directement dans Langfuse avec un évaluateur [LLM-as-a-Judge](https://langfuse.com/docs/evaluation/evaluation-methods/llm-as-a-judge) qui score les traces en continu (sans passer par DeepEval), c'est moins flexible mais ça peut suffire.
+- **Automatiser l'éval en ligne** directement dans Langfuse avec un évaluateur [LLM-as-a-Judge](https://langfuse.com/docs/evaluation/evaluation-methods/llm-as-a-judge) qui score en continu les **observations** ciblées — sans passer par DeepEval. C'est moins flexible mais ça peut suffire.
 - **Versionner un Dataset Langfuse** et lancer des [Experiments](https://langfuse.com/docs/evaluation/experiments/experiments-via-sdk) pour comparer des runs côte à côte (retour vers l'évaluation hors ligne, outillée).
 
 ---

@@ -49,7 +49,7 @@ def build_langfuse_client() -> Langfuse | None:
     return Langfuse(
         public_key=public_key,
         secret_key=secret_key,
-        host=os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com"),
+        base_url=os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com"),
     )
 
 

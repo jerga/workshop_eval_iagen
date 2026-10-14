@@ -18,14 +18,11 @@ def _setup_langfuse() -> None:
     fonctionne normalement et aucune trace n'est envoyee.
     """
     load_dotenv()
+    # Le SDK lit nativement LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY / LANGFUSE_BASE_URL.
     has_keys = bool(
         os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY")
     )
-    if has_keys:
-        base_url = os.getenv("LANGFUSE_BASE_URL")
-        if base_url and not os.getenv("LANGFUSE_HOST"):
-            os.environ["LANGFUSE_HOST"] = base_url
-    else:
+    if not has_keys:
         os.environ.setdefault("LANGFUSE_TRACING_ENABLED", "false")
         logging.getLogger("langfuse").setLevel(logging.ERROR)
 

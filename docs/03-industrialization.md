@@ -116,7 +116,7 @@ Exécute le pipeline, découvre le reporting proposé, et analyse les résultats
 deepeval test run ./eval/step3_industrialization/test_pipeline_v1.py --tb=no
 
 # En cas d'erreur d'exécution du CLI deepeval (permissions, installation, ...) :
-python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v1.py --tb=no
+uv run python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v1.py --tb=no
 ```
 
 > [!TIP]
@@ -220,7 +220,7 @@ Relance le pipeline comme à l'étape 1 et vérifie que les deux évaluations so
 deepeval test run ./eval/step3_industrialization/test_pipeline_v2.py --tb=no
 
 # En cas d'erreur d'exécution du CLI deepeval (permissions, installation, ...) :
-python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v2.py --tb=no
+uv run python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v2.py --tb=no
 ```
 
 Tu dois voir en sortie :
@@ -272,7 +272,7 @@ Le but est de conserver des services de métrique génériques, et de gérer le 
 > deepeval test run ./eval/step3_industrialization/test_pipeline_v3.py --tb=no
 >
 > # En cas d'erreur d'exécution du CLI deepeval (permissions, installation, ...) :
-> python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v3.py --tb=no
+> uv run python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v3.py --tb=no
 > ```
 
 ---
@@ -522,7 +522,7 @@ Rappel si pas fait au fur et à mesure de l'avancée : relance le pipeline v3 av
 deepeval test run ./eval/step3_industrialization/test_pipeline_v3.py --tb=no
 
 # En cas d'erreur d'exécution du CLI deepeval (permissions, installation, ...) :
-python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v3.py --tb=no
+uv run python -m deepeval.cli.main test run ./eval/step3_industrialization/test_pipeline_v3.py --tb=no
 ```
 
 <details>

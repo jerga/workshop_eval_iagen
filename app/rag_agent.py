@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from langfuse import get_client, observe
+from langfuse import get_client, observe, propagate_attributes
 
 from app.config import load_config
 from app.embeddings import DocumentEmbeddingCache, OpenAICompatibleEmbeddings
@@ -11,6 +11,8 @@ from app.models import AgentResult, ToolCall
 from app.prompts import SYSTEM_PROMPT, build_user_prompt
 from app.retrieval import SimpleRetriever
 from app.tools import get_service_status
+
+TRACE_NAME = "support-rag-agent"
 
 
 class SupportRAGAgent:
@@ -41,29 +43,34 @@ class SupportRAGAgent:
 
         return None
 
-    @observe(name="support-rag-agent")
+    @observe(name=TRACE_NAME, capture_input=False, capture_output=False)
     def answer(self, question: str) -> AgentResult:
-        retrieved = self.retriever.search(question, top_k=3)
+        # Trace input/output = celles de l'observation racine (modele v4).
+        client = get_client()
+        client.update_current_span(input=question)
 
-        tool_calls: list[ToolCall] = []
-        service_name = self._detect_service_name(question)
-        if service_name is not None:
-            tool_result = get_service_status(service_name, self.config.service_status_file)
-            tool_calls.append(
-                ToolCall(
-                    tool_name="get_service_status",
-                    arguments={"service_name": service_name},
-                    result=tool_result,
+        with propagate_attributes(trace_name=TRACE_NAME):
+            retrieved = self.retriever.search(question, top_k=3)
+
+            tool_calls: list[ToolCall] = []
+            service_name = self._detect_service_name(question)
+            if service_name is not None:
+                tool_result = get_service_status(service_name, self.config.service_status_file)
+                tool_calls.append(
+                    ToolCall(
+                        tool_name="get_service_status",
+                        arguments={"service_name": service_name},
+                        result=tool_result,
+                    )
                 )
-            )
 
-        prompt = build_user_prompt(question, retrieved, tool_calls)
-        final_answer = self.llm.chat(
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ]
-        )
+            prompt = build_user_prompt(question, retrieved, tool_calls)
+            final_answer = self.llm.chat(
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt},
+                ]
+            )
 
         metadata = {
             "question": question,
@@ -72,10 +79,7 @@ class SupportRAGAgent:
             "model": self.config.llm_model,
         }
 
-        # On expose une entree/sortie de trace lisible (question -> reponse)
-        client = get_client()
-        client.set_current_trace_io(input=question, output=final_answer)
-        client.update_current_span(metadata=metadata)
+        client.update_current_span(output=final_answer, metadata=metadata)
 
         return AgentResult(
             answer=final_answer,

@@ -1,6 +1,6 @@
 # Workshop — Évaluation d'une application GenAI
 
-Workshop pratique (1 h à 2 h) pour apprendre à évaluer une application GenAI (agent de support IT), de façon progressive : du smoke test jusqu'à une démarche industrielle.
+Workshop pratique (2 h à 3 h) pour apprendre à évaluer une application GenAI (agent de support IT), de façon progressive : du smoke test jusqu'à une démarche industrielle.
 
 ## Démarrer
 
@@ -13,8 +13,8 @@ Deux approches sont possibles : **dans le cloud avec GitHub Codespaces** (rien �
 
 Evite tout problème de configuration locale (mais demande un compte Github + de ne pas avoir épuisé sont "quota" Codespace).
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/jerga/workshop_eval_iagen?quickstart=1)
-
+> [!TIP]
+> Pour utiliser votre propre quota de temps Codespace, il suffit de forker le repository, puis lancer **Codespace** via le bouton `<> Code` vert
 
 ### En local
 

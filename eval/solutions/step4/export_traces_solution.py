@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ from langfuse import Langfuse
 
 TRACE_NAME = "support-rag-agent"
 EXPORT_LIMIT = 3
+LOOKBACK = timedelta(days=7)
 OUTPUT_PATH = Path(__file__).resolve().parent / "datasets" / "online_traces.json"
 
 
@@ -18,22 +20,30 @@ def build_client() -> Langfuse:
     return Langfuse(
         public_key=os.environ["LANGFUSE_PUBLIC_KEY"],
         secret_key=os.environ["LANGFUSE_SECRET_KEY"],
-        host=os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com"),
+        base_url=os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com"),
     )
 
 
 def export_traces() -> list[dict[str, object]]:
     client = build_client()
-    response = client.api.trace.list(name=TRACE_NAME, limit=EXPORT_LIMIT)
+    now = datetime.now(timezone.utc)
+    response = client.api.observations.get_many(
+        name=TRACE_NAME,
+        fields="core,basic,io",
+        from_start_time=now - LOOKBACK,
+        to_start_time=now,
+        limit=EXPORT_LIMIT,
+    )
 
     traces = [
         {
-            "trace_id": item.id,
-            "timestamp": str(item.timestamp),
+            "trace_id": item.trace_id,
+            "timestamp": str(item.start_time),
             "input": item.input,
             "output": item.output,
         }
         for item in response.data
+        if item.parent_observation_id is None
     ]
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
